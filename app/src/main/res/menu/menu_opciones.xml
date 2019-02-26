@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item android:id="@+id/optMiPerfil"
+            android:title="Mi Perfil"
+            android:icon="@drawable/icono_usuario"/>
         <item android:id="@+id/optAlumno"
-            android:title="Como Alumno" />
+            android:title="Como Alumno"
+            android:icon="@drawable/icono_alumno"/>
         <item android:id="@+id/optProfesor"
-            android:title="Como profesor" />
+            android:title="Como profesor"
+            android:icon="@drawable/icono_profesor"/>
+        <item android:id="@+id/optCerrarSesion"
+            android:title="Cerrar Sesión"
+            android:icon="@drawable/icono_cerrarsesion"/>
 </menu>
