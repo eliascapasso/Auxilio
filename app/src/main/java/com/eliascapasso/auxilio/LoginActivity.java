@@ -61,9 +61,11 @@ public class LoginActivity extends AppCompatActivity{
     }
 
     private void inicializar(){
-        edtEmail.setText(obtenerLoginSharedPreferencesString(getApplicationContext(),"email"));
-        edtPass.setText(obtenerLoginSharedPreferencesString(getApplicationContext(),"pass"));
-        swRecordarInicio.setChecked(obtenerLoginSharedPreferencesCheckBoxRecordar(getApplicationContext(), "recordar"));
+        if(obtenerLoginSharedPreferencesCheckBoxRecordar(getApplicationContext(), "recordar")){
+            edtEmail.setText(obtenerLoginSharedPreferencesString(getApplicationContext(),"email"));
+            edtPass.setText(obtenerLoginSharedPreferencesString(getApplicationContext(),"pass"));
+            swRecordarInicio.setChecked(obtenerLoginSharedPreferencesCheckBoxRecordar(getApplicationContext(), "recordar"));
+        }
 
         if(swRecordarInicio.isChecked()){
             Intent main = new Intent(LoginActivity.this, MainActivity.class);
@@ -76,17 +78,6 @@ public class LoginActivity extends AppCompatActivity{
         btnIniciarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String email = edtEmail.getText().toString();
-                String pass = edtPass.getText().toString();
-
-                //Preferencias compartidas
-                if(swRecordarInicio.isChecked()){
-                    guardarLoginSharedPreferences(email, pass);
-                }
-                else{
-                    guardarLoginSharedPreferences("", "");
-                }
-
                 if(validarCampos()){
                     obtenerUsuario();
                 }
@@ -147,6 +138,10 @@ public class LoginActivity extends AppCompatActivity{
                     }
 
                     if(edtEmail.getText().toString().equals(miUsuario.getCorreo()) && edtPass.getText().toString().equals(miUsuario.getPass())){
+
+                        //Preferencias compartidas
+                        guardarLoginSharedPreferences(edtEmail.getText().toString(), edtPass.getText().toString());
+
                         Intent main = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(main);
                         finish();
@@ -164,38 +159,17 @@ public class LoginActivity extends AppCompatActivity{
         request.add(jsonObjectRequest);
     }
 
-    public void hacerGet(String url, final DataResponseListener mListener) {
-        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                //Se conecta exitosamente
-                response -> {
-                    progressDialog.hide();
-
-                    mListener.onResponseData(response);
-                },
-                //No se conectar
-                error -> {
-                    progressDialog.hide();
-                    Toast.makeText(LoginActivity.this, "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
-                    Log.i("ERROR: ", error.toString());
-                });
-        request.add(jsonObjectRequest);
-    }
-
-    public interface DataResponseListener {
-        void onResponseData(JSONObject data);
-    }
-
     private void guardarLoginSharedPreferences(String email, String pass) {
         SharedPreferences sharedPref = getSharedPreferences("login_preferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("email", email);
         editor.putString("pass", pass);
 
-        if(email.equals("") && pass.equals("")){
-            editor.putBoolean("recordar", false);
-        }
-        else{
+        if(swRecordarInicio.isChecked()){
             editor.putBoolean("recordar", true);
+        }
+        else {
+            editor.putBoolean("recordar", false);
         }
 
         editor.apply();
