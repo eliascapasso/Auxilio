@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragmentos.CursoFragment">
+    tools:context=".Fragmentos.AlumnoCursoFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -16,7 +16,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="60dp"
         android:text="-Costo-"
-        android:textColor="@android:color/background_light"
+        android:textColor="@android:color/background_dark"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.085"
@@ -31,7 +31,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="44dp"
         android:text="-Descripción-"
-        android:textColor="@android:color/background_light"
+        android:textColor="@android:color/black"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.108"
@@ -46,7 +46,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
         android:text="-Duración-"
-        android:textColor="@android:color/background_light"
+        android:textColor="@android:color/background_dark"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.094"
@@ -61,7 +61,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="-TITULO DEL CURSO-"
-        android:textColor="@android:color/background_light"
+        android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.503"
@@ -69,11 +69,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/btnSolicitarCurso"
         android:layout_width="121dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="140dp"
-        android:text="Editar"
+        android:text="Solicitar"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
         tools:layout_editor_absoluteX="132dp" />
 

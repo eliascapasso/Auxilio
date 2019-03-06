@@ -1,6 +1,7 @@
 package com.eliascapasso.auxilio.Actividades;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,14 +15,26 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.eliascapasso.auxilio.Fragmentos.AlumnoFragment;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
+import com.eliascapasso.auxilio.Fragmentos.AlumnoListaCursosFragment;
 import com.eliascapasso.auxilio.Fragmentos.EditarPerfilFragment;
-import com.eliascapasso.auxilio.Fragmentos.ProfesorFragment;
+import com.eliascapasso.auxilio.Fragmentos.ProfesorIngresarCodigoFragment;
+import com.eliascapasso.auxilio.Fragmentos.SolicitarCredencialFragment;
+import com.eliascapasso.auxilio.Modelo.Usuario;
 import com.eliascapasso.auxilio.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
@@ -31,6 +44,14 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int INTERVALO = 2000; //2 segundos para salir
     private long tiempoPrimerClick;
+
+    private Usuario usuarioActual;
+
+    private ProgressDialog progressDialog;
+    private RequestQueue request;
+    private JsonObjectRequest jsonObjectRequest;
+
+    private static String PREFS_KEY = "login_preferences";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +67,50 @@ public class MainActivity extends AppCompatActivity {
         mToggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        request = Volley.newRequestQueue(this);
+
+        obtenerUsuario();
+
         setupNavigationDrawerContent(navView);
 
         setFragment(1);
+    }
+
+    private void obtenerUsuario() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Cargando...");
+        progressDialog.show();
+
+        //Obtiene el usuario de la bd con el correo
+        String ip = "192.168.0.18:8080";
+        String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" + obtenerLoginSharedPreferencesString(MainActivity.this,"email");
+
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                //Se conecta exitosamente
+                response -> {
+                    progressDialog.hide();
+                    JSONArray jsonArray = response.optJSONArray("usuario");
+
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = jsonArray.getJSONObject(0);
+                        usuarioActual = new Usuario(jsonObject.optInt("dni"),
+                                jsonObject.optString("nombre"),
+                                jsonObject.optString("apellido"),
+                                jsonObject.optString("nacimiento"),
+                                jsonObject.optString("correo"),
+                                jsonObject.optString("pass"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                //No se conectar
+                error -> {
+                    progressDialog.hide();
+                    Toast.makeText(MainActivity.this, "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
+                    Log.i("ERROR: ", error.toString());
+                });
+        request.add(jsonObjectRequest);
     }
 
     private void setupNavigationDrawerContent(NavigationView navigationView) {
@@ -104,18 +166,35 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 fragmentManager = getSupportFragmentManager();
                 fragmentTransaction = fragmentManager.beginTransaction();
-                AlumnoFragment alumnoFragment = new AlumnoFragment();
-                fragmentTransaction.replace(R.id.contenido, alumnoFragment);
+                AlumnoListaCursosFragment alumnoListaCursosFragment = new AlumnoListaCursosFragment();
+                fragmentTransaction.replace(R.id.contenido, alumnoListaCursosFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
                 break;
             case 2:
-                fragmentManager = getSupportFragmentManager();
-                fragmentTransaction = fragmentManager.beginTransaction();
-                ProfesorFragment profesorFragment = new ProfesorFragment();
-                fragmentTransaction.replace(R.id.contenido, profesorFragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                //El usuario aun no se registró como profesor
+                if(usuarioActual.getMembresia().equals(EstadoMembresia.DESHABILITADA)){
+                    fragmentManager = getSupportFragmentManager();
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    SolicitarCredencialFragment solicitarCredencialFragment = new SolicitarCredencialFragment();
+                    fragmentTransaction.replace(R.id.contenido, solicitarCredencialFragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+                //El usuario se registró como profesor, pero aún no asistió a la reunion
+                else if(usuarioActual.getMembresia().equals(EstadoMembresia.EN_ESPERA)){
+                    fragmentManager = getSupportFragmentManager();
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    ProfesorIngresarCodigoFragment profesorIngresarCodigoFragment = new ProfesorIngresarCodigoFragment();
+                    fragmentTransaction.replace(R.id.contenido, profesorIngresarCodigoFragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+                //Es usuario está registrado y con membresia habilitada
+                else if(usuarioActual.getMembresia().equals(EstadoMembresia.HABILITADA)){
+
+                }
+
                 break;
             case 3:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -145,6 +224,11 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
                 break;
         }
+    }
+
+    public static String obtenerLoginSharedPreferencesString(Context context, String keyPref) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
+        return  preferences.getString(keyPref, "");
     }
 
     @Override

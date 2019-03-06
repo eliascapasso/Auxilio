@@ -12,15 +12,15 @@ import com.eliascapasso.auxilio.R;
 
 import java.util.ArrayList;
 
-public class AlumnoFragment extends android.support.v4.app.Fragment {
+public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
     private ArrayList<Curso> listaCursos;
     private ListView lvCursos;
 
-    public AlumnoFragment() {
+    public AlumnoListaCursosFragment() {
 
     }
 
-    public static AlumnoFragment newInstance(String param1, String param2) {
+    public static AlumnoListaCursosFragment newInstance(String param1, String param2) {
 
         return null;
     }
@@ -28,9 +28,9 @@ public class AlumnoFragment extends android.support.v4.app.Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_alumno, container, false);
+        View view = inflater.inflate(R.layout.fragment_alumno_lista_cursos, container, false);
 
-        lvCursos = (ListView) view.findViewById(R.id.lstCursos);
+        lvCursos = (ListView) view.findViewById(R.id.lstCursosAlumno);
 
         inicializarAtributos(view);
 
