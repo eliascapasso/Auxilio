@@ -1,4 +1,4 @@
-package com.eliascapasso.auxilio;
+package com.eliascapasso.auxilio.Actividades;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -19,6 +19,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.eliascapasso.auxilio.Modelo.Usuario;
+import com.eliascapasso.auxilio.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -113,7 +114,7 @@ public class LoginActivity extends AppCompatActivity{
         progressDialog.show();
 
         //Obtiene el usuario de la bd con el correo
-        String ip = "192.168.0.38:8080";
+        String ip = "192.168.0.18:8080";
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" + edtEmail.getText().toString();
 
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,

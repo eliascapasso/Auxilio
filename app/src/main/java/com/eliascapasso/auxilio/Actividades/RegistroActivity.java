@@ -1,4 +1,4 @@
-package com.eliascapasso.auxilio;
+package com.eliascapasso.auxilio.Actividades;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
@@ -17,6 +17,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.eliascapasso.auxilio.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

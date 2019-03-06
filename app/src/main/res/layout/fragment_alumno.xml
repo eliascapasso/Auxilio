@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#dfdcdc"
-    tools:context=".AlumnoFragment">
+    tools:context=".Fragmentos.AlumnoFragment">
 
     <SearchView
         android:id="@+id/busqueda"

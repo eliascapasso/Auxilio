@@ -5,17 +5,18 @@ import java.util.Date;
 
 public class Curso {
     private static int idCurso = 0;
-    private Date fecha;
-    private Time hora;
-    private Double costo;
+    private String titulo;
+    private String fecha;
+    private int costo;
     private int cupos;
-    private Double calificacion;
+    private Float calificacion;
+    private String duracion;
     private int idProfesor;
 
-    public Curso(Date fecha, Time hora, Double costo, int cupos, Double calificacion, int idProfesor) {
+    public Curso(String titulo, String fecha, int costo, int cupos, Float calificacion, int idProfesor) {
         idCurso++;
+        this.titulo = titulo;
         this.fecha = fecha;
-        this.hora = hora;
         this.costo = costo;
         this.cupos = cupos;
         this.calificacion = calificacion;
@@ -30,27 +31,35 @@ public class Curso {
         Curso.idCurso = idCurso;
     }
 
-    public Date getFecha() {
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public String getDuracion() {
+        return duracion;
+    }
+
+    public void setDuracion(String duracion) {
+        this.duracion = duracion;
+    }
+
+    public String getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(String fecha) {
         this.fecha = fecha;
     }
 
-    public Time getHora() {
-        return hora;
-    }
-
-    public void setHora(Time hora) {
-        this.hora = hora;
-    }
-
-    public Double getCosto() {
+    public int getCosto() {
         return costo;
     }
 
-    public void setCosto(Double costo) {
+    public void setCosto(int costo) {
         this.costo = costo;
     }
 
@@ -62,11 +71,11 @@ public class Curso {
         this.cupos = cupos;
     }
 
-    public Double getCalificacion() {
+    public Float getCalificacion() {
         return calificacion;
     }
 
-    public void setCalificacion(Double calificacion) {
+    public void setCalificacion(Float calificacion) {
         this.calificacion = calificacion;
     }
 
