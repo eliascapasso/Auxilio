@@ -1,8 +1,5 @@
 package com.eliascapasso.auxilio.Modelo;
 
-import java.sql.Time;
-import java.util.Date;
-
 public class Curso {
     private static int idCurso = 0;
     private String titulo;

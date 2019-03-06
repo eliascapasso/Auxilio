@@ -11,7 +11,6 @@ import com.eliascapasso.auxilio.Modelo.Curso;
 import com.eliascapasso.auxilio.R;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class AlumnoFragment extends android.support.v4.app.Fragment {
     private ArrayList<Curso> listaCursos;
