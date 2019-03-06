@@ -31,11 +31,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="Email"
-            android:inputType="textEmailAddress"
+            android:inputType="textAutoCorrect|textAutoComplete|textEmailAddress"
             tools:ignore="MissingConstraints" />
 
         <EditText
-            android:id="@+id/edtPass"
+            android:id="@+id/edtPassReg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"

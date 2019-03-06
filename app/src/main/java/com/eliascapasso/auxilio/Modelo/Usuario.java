@@ -7,9 +7,47 @@ public class Usuario {
     private String nacimiento;
     private String correo;
     private String pass;
+    private String fotoPerfil;
+    private int idAlumno;
+    private int idProfesor;
 
-    public Usuario(){
+    public Usuario(int dni, String nombre, String apellido, String nacimiento, String correo, String pass) {
+        this.dni = dni;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.nacimiento = nacimiento;
+        this.correo = correo;
+        this.pass = pass;
 
+        this.fotoPerfil="";
+        this.idAlumno=0;
+        this.idProfesor=0;
+    }
+
+    public Usuario(){}
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
+    }
+
+    public int getIdAlumno() {
+        return idAlumno;
+    }
+
+    public void setIdAlumno(int idAlumno) {
+        this.idAlumno = idAlumno;
+    }
+
+    public int getIdProfesor() {
+        return idProfesor;
+    }
+
+    public void setIdProfesor(int idProfesor) {
+        this.idProfesor = idProfesor;
     }
 
     public int getDni() {

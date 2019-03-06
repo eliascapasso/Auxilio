@@ -38,19 +38,21 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="DNI"
-                android:inputType="number" />
+                android:inputType="textAutoCorrect|textAutoComplete|number" />
 
             <EditText
                 android:id="@+id/edtNombre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nombre" />
+                android:hint="Nombre"
+                android:inputType="textAutoCorrect|textAutoComplete|textPersonName" />
 
             <EditText
                 android:id="@+id/edtApellido"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Apellido" />
+                android:hint="Apellido"
+                android:inputType="textAutoCorrect|textAutoComplete|textPersonName" />
 
             <com.shagi.materialdatepicker.date.AccessibleDateAnimator
                 android:id="@+id/dpkNacimiento"
@@ -72,19 +74,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Correo"
-                android:inputType="textEmailAddress" />
+                android:inputType="textAutoCorrect|textAutoComplete|textEmailAddress" />
 
             <EditText
-                android:id="@+id/edtPass"
+                android:id="@+id/edtPassReg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Contraseña" />
+                android:hint="Contraseña"
+                android:inputType="textPassword" />
 
             <EditText
                 android:id="@+id/edtConfPass"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Confirmar contraseña" />
+                android:hint="Confirmar contraseña"
+                android:inputType="textPassword" />
 
             <Button
                 android:id="@+id/btnRegistrar"

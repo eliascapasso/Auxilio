@@ -2,21 +2,20 @@ package com.eliascapasso.auxilio;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
-import android.net.sip.SipSession;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
@@ -24,10 +23,12 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Pattern;
 
-public class RegistroActivity extends AppCompatActivity implements Response.Listener<JSONObject>, Response.ErrorListener{
+public class RegistroActivity extends AppCompatActivity{
     final Calendar myCalendar = Calendar.getInstance();
 
     private EditText edtNacimiento;
@@ -39,10 +40,8 @@ public class RegistroActivity extends AppCompatActivity implements Response.List
     private EditText edtConfPass;
     private Button btnRegistrar;
 
-    private RequestQueue request;
-    private JsonObjectRequest jsonObjectRequest;
     private ProgressDialog progressDialog;
-
+    private RequestQueue request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,7 @@ public class RegistroActivity extends AppCompatActivity implements Response.List
         edtNombre= (EditText) findViewById(R.id.edtNombre);
         edtApellido= (EditText) findViewById(R.id.edtApellido);
         edtCorreo= (EditText) findViewById(R.id.edtEmail);
-        edtPass= (EditText) findViewById(R.id.edtPass);
+        edtPass= (EditText) findViewById(R.id.edtPassReg);
         edtConfPass= (EditText) findViewById(R.id.edtConfPass);
         btnRegistrar = (Button) findViewById(R.id.btnRegistrar);
 
@@ -69,18 +68,23 @@ public class RegistroActivity extends AppCompatActivity implements Response.List
         btnRegistrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                cargarWebService();
+                if(validarCampos()){
+                    cargarUsuario();
+                }
+                else{
+                    Toast.makeText(RegistroActivity.this, "Campos inválidos", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
 
-    private void cargarWebService(){
+    private void cargarUsuario(){
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Cargando...");
         progressDialog.show();
 
         //Agrega el usuario a la bd
-        String ip = "192.168.0.43:8080";
+        String ip = "192.168.0.38:8080";
         String url = "http://"+ ip +"/auxilioBD/wsJSONRegistro.php?" +
                 "dni="+edtDni.getText().toString()+
                 "&nombre="+edtNombre.getText().toString()+
@@ -90,8 +94,68 @@ public class RegistroActivity extends AppCompatActivity implements Response.List
                 "&pass="+edtPass.getText().toString();
         url = url.replace(" ", "%20");
 
-        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null, this, this);
-        request.add(jsonObjectRequest);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    progressDialog.hide();
+                    Toast.makeText(RegistroActivity.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
+
+                    try {
+                        //converting response to json object
+                        JSONObject obj = new JSONObject(response);
+
+                        //if no error in response
+                        if (!obj.getBoolean("error")) {
+                            Log.i("MENSAJE:", obj.getString("message"));
+                        } else {
+                            Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    edtDni.setText("");
+                    edtNombre.setText("");
+                    edtApellido.setText("");
+                    edtCorreo.setText("");
+                    edtNacimiento.setText("");
+                    edtPass.setText("");
+                    edtConfPass.setText("");
+                },
+                error -> {
+                    progressDialog.hide();
+                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("nombre", edtNombre.getText().toString());
+                params.put("apellido", edtApellido.getText().toString());
+                params.put("correo", edtCorreo.getText().toString());
+                params.put("nacimiento", edtNacimiento.getText().toString());
+                params.put("pass", edtNacimiento.getText().toString());
+                return params;
+            }
+        };
+
+        request.add(stringRequest);
+    }
+
+    private boolean validarCampos(){
+        if(edtCorreo.getText().toString().length() == 0 ||
+                edtPass.getText().toString().length() == 0 ||
+                edtApellido.getText().toString().length() == 0 ||
+                edtNombre.getText().toString().length() == 0 ||
+                edtDni.getText().toString().length() == 0 ||
+                edtNacimiento.getText().toString().length() == 0 ||
+                edtConfPass.getText().toString().length() == 0){
+            return false;
+        }
+        if(!edtConfPass.getText().toString().equals(edtPass.getText().toString())){
+            return false;
+        }
+
+        Pattern pattern = Patterns.EMAIL_ADDRESS;
+        return pattern.matcher(edtCorreo.getText().toString()).matches();
     }
 
     private void fechaNacieminto(){
@@ -123,24 +187,5 @@ public class RegistroActivity extends AppCompatActivity implements Response.List
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("es"));
 
         edtNacimiento.setText(sdf.format(myCalendar.getTime()).toString());
-    }
-
-    @Override
-    public void onResponse(JSONObject response) {
-        Toast.makeText(this, "Se ha registrado el usuario exitosamente", Toast.LENGTH_SHORT).show();
-        progressDialog.hide();
-        edtNacimiento.setText("");
-        edtNombre.setText("");
-        edtApellido.setText("");
-        edtCorreo.setText("");
-        edtPass.setText("");
-        edtConfPass.setText("");
-    }
-
-    @Override
-    public void onErrorResponse(VolleyError error) {
-        progressDialog.hide();
-        Toast.makeText(this, "No se pudo registrar el usuario: " + error.toString()  , Toast.LENGTH_SHORT).show();
-        Log.i("ERROR: ", error.toString());
     }
 }

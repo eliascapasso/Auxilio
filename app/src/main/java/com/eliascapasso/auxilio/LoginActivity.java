@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,8 +16,6 @@ import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.eliascapasso.auxilio.Modelo.Usuario;
@@ -25,7 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LoginActivity extends AppCompatActivity implements Response.Listener<JSONObject>, Response.ErrorListener {
+import java.util.regex.Pattern;
+
+public class LoginActivity extends AppCompatActivity{
 
     private EditText edtEmail;
     private EditText edtPass;
@@ -45,7 +46,7 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
         setContentView(R.layout.activity_login);
 
         edtEmail = (EditText) findViewById(R.id.edtEmail);
-        edtPass = (EditText) findViewById(R.id.edtPass);
+        edtPass = (EditText) findViewById(R.id.edtPassReg);
         btnIniciarSesion = (Button) findViewById(R.id.btnIniciarSesion);
         btnRegistrarse = (Button) findViewById(R.id.btnRegistrarse);
         swRecordarInicio = (Switch) findViewById(R.id.swSesionIniciada);
@@ -86,13 +87,23 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
                     guardarLoginSharedPreferences("", "");
                 }
 
-                cargarWebService();
-
-                /*Intent main = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(main);
-                finish();*/
+                if(validarCampos()){
+                    obtenerUsuario();
+                }
+                else{
+                    Toast.makeText(LoginActivity.this, "Correo y/o contraseña inválidas", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+    }
+
+    private boolean validarCampos(){
+        if(edtEmail.getText().toString().length() == 0 || edtPass.getText().toString().length() == 0){
+            return false;
+        }
+
+        Pattern pattern = Patterns.EMAIL_ADDRESS;
+        return pattern.matcher(edtEmail.getText().toString()).matches();
     }
 
     private void registrarse(){
@@ -105,17 +116,73 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
         });
     }
 
-    private void cargarWebService(){
+    private void obtenerUsuario(){
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Cargando...");
         progressDialog.show();
 
         //Obtiene el usuario de la bd con el correo
-        String ip = "192.168.0.43:8080";
+        String ip = "192.168.0.38:8080";
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" + edtEmail.getText().toString();
 
-        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url,null, this, this);
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                //Se conecta exitosamente
+                response -> {
+                    progressDialog.hide();
+
+                    Usuario miUsuario = new Usuario();
+                    JSONArray jsonArray = response.optJSONArray("usuario");
+
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = jsonArray.getJSONObject(0);
+                        miUsuario.setDni(jsonObject.optInt("dni"));
+                        miUsuario.setNombre(jsonObject.optString("nombre"));
+                        miUsuario.setApellido(jsonObject.optString("apellido"));
+                        miUsuario.setNacimiento(jsonObject.optString("nacimiento"));
+                        miUsuario.setCorreo(jsonObject.optString("correo"));
+                        miUsuario.setPass(jsonObject.optString("pass"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(edtEmail.getText().toString().equals(miUsuario.getCorreo()) && edtPass.getText().toString().equals(miUsuario.getPass())){
+                        Intent main = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(main);
+                        finish();
+                    }
+                    else{
+                        Toast.makeText(LoginActivity.this, "Correo y/o contraseña inválidas", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                //No se conectar
+                error -> {
+                    progressDialog.hide();
+                    Toast.makeText(LoginActivity.this, "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
+                    Log.i("ERROR: ", error.toString());
+                });
         request.add(jsonObjectRequest);
+    }
+
+    public void hacerGet(String url, final DataResponseListener mListener) {
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                //Se conecta exitosamente
+                response -> {
+                    progressDialog.hide();
+
+                    mListener.onResponseData(response);
+                },
+                //No se conectar
+                error -> {
+                    progressDialog.hide();
+                    Toast.makeText(LoginActivity.this, "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
+                    Log.i("ERROR: ", error.toString());
+                });
+        request.add(jsonObjectRequest);
+    }
+
+    public interface DataResponseListener {
+        void onResponseData(JSONObject data);
     }
 
     private void guardarLoginSharedPreferences(String email, String pass) {
@@ -143,35 +210,5 @@ public class LoginActivity extends AppCompatActivity implements Response.Listene
     public static boolean obtenerLoginSharedPreferencesCheckBoxRecordar(Context context, String keyPref) {
         SharedPreferences preferences = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
         return  preferences.getBoolean(keyPref, false);
-    }
-
-    @Override
-    public void onErrorResponse(VolleyError error) {
-        progressDialog.hide();
-        Toast.makeText(this, "No se pudo obtener el usuario: " + error.toString()  , Toast.LENGTH_SHORT).show();
-        Log.i("ERROR: ", error.toString());
-    }
-
-    @Override
-    public void onResponse(JSONObject response) {
-        progressDialog.hide();
-
-        Usuario miUsuario = new Usuario();
-        JSONArray jsonArray = response.optJSONArray("usuario");
-
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = jsonArray.getJSONObject(0);
-            miUsuario.setDni(jsonObject.optInt("dni"));
-            miUsuario.setNombre(jsonObject.optString("nombre"));
-            miUsuario.setApellido(jsonObject.optString("apellido"));
-            miUsuario.setNacimiento(jsonObject.optString("nacimiento"));
-            miUsuario.setCorreo(jsonObject.optString("correo"));
-            miUsuario.setPass(jsonObject.optString("pass"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        Toast.makeText(this, "DNI: " + Integer.toString(miUsuario.getDni())  , Toast.LENGTH_SHORT).show();
     }
 }
