@@ -31,6 +31,15 @@
                 android:layout_weight="1"
                 app:srcCompat="@drawable/perfil" />
 
+            <Button
+                android:id="@+id/btnFotoPerfil"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/holo_red_dark"
+                android:text="Foto de perfil"
+                android:textColor="@android:color/background_light" />
+
             <EditText
                 android:id="@+id/edtDni"
                 android:layout_width="match_parent"

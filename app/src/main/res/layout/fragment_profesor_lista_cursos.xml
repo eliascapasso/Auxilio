@@ -13,10 +13,10 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/texw12"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cursos como alumno"
+            android:text="Cursos como profesor"
             android:textAlignment="center"
             android:textColor="@android:color/black" />
 

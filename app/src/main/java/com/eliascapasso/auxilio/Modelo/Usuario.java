@@ -1,5 +1,9 @@
 package com.eliascapasso.auxilio.Modelo;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+
 import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
 
 import java.util.ArrayList;
@@ -13,7 +17,9 @@ public class Usuario {
     private String nacimiento;
     private String correo;
     private String pass;
-    private String fotoPerfil;
+    private String dato;
+    private Bitmap fotoPerfil;
+    private String rutaImagen;
 
     //Atributos de profesor
     private ArrayList<Curso> cursosProfesor;
@@ -33,7 +39,8 @@ public class Usuario {
         this.nacimiento = nacimiento;
         this.correo = correo;
         this.pass = pass;
-        this.fotoPerfil="";
+
+        this.rutaImagen = "";
 
         //Profesor
         this.cursosProfesor = new ArrayList<Curso>();
@@ -49,12 +56,44 @@ public class Usuario {
 
     //Metodos de usuario
 
-    public String getFotoPerfil() {
+
+    public String getDato() {
+        return dato;
+    }
+
+    public void setDato(String dato) {
+        this.dato = dato;
+
+        try {
+            byte[] byteCode= Base64.decode(dato,Base64.DEFAULT);
+            //this.imagen= BitmapFactory.decodeByteArray(byteCode,0,byteCode.length);
+
+            int alto=100;//alto en pixeles
+            int ancho=150;//ancho en pixeles
+
+            Bitmap foto= BitmapFactory.decodeByteArray(byteCode,0,byteCode.length);
+            this.fotoPerfil=Bitmap.createScaledBitmap(foto,alto,ancho,true);
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public Bitmap getFotoPerfil() {
         return fotoPerfil;
     }
 
-    public void setFotoPerfil(String fotoPerfil) {
+    public void setFotoPerfil(Bitmap fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
+    }
+
+    public String getRutaImagen() {
+        return rutaImagen;
+    }
+
+    public void setRutaImagen(String rutaImagen) {
+        this.rutaImagen = rutaImagen;
     }
 
     public int getDni() {

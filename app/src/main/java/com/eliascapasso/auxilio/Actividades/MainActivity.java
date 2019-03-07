@@ -28,6 +28,7 @@ import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
 import com.eliascapasso.auxilio.Fragmentos.AlumnoListaCursosFragment;
 import com.eliascapasso.auxilio.Fragmentos.EditarPerfilFragment;
 import com.eliascapasso.auxilio.Fragmentos.ProfesorIngresarCodigoFragment;
+import com.eliascapasso.auxilio.Fragmentos.ProfesorListaCursosFragment;
 import com.eliascapasso.auxilio.Fragmentos.SolicitarCredencialFragment;
 import com.eliascapasso.auxilio.Modelo.Usuario;
 import com.eliascapasso.auxilio.R;
@@ -83,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Obtiene el usuario de la bd con el correo
         String ip = "192.168.0.18:8080";
-        String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" + obtenerLoginSharedPreferencesString(MainActivity.this,"email");
+        String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" +
+                obtenerLoginSharedPreferencesString(MainActivity.this,"email");
 
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 //Se conecta exitosamente
@@ -160,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction = fragmentManager.beginTransaction();
                 EditarPerfilFragment editarPerfilFragment = new EditarPerfilFragment();
                 fragmentTransaction.replace(R.id.contenido, editarPerfilFragment);
-                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.addToBackStack("frag1");
                 fragmentTransaction.commit();
                 break;
             case 1:
@@ -168,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction = fragmentManager.beginTransaction();
                 AlumnoListaCursosFragment alumnoListaCursosFragment = new AlumnoListaCursosFragment();
                 fragmentTransaction.replace(R.id.contenido, alumnoListaCursosFragment);
-                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.addToBackStack("frag2");
                 fragmentTransaction.commit();
                 break;
             case 2:
@@ -178,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                     fragmentTransaction = fragmentManager.beginTransaction();
                     SolicitarCredencialFragment solicitarCredencialFragment = new SolicitarCredencialFragment();
                     fragmentTransaction.replace(R.id.contenido, solicitarCredencialFragment);
-                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.addToBackStack("frag3");
                     fragmentTransaction.commit();
                 }
                 //El usuario se registró como profesor, pero aún no asistió a la reunion
@@ -187,14 +189,18 @@ public class MainActivity extends AppCompatActivity {
                     fragmentTransaction = fragmentManager.beginTransaction();
                     ProfesorIngresarCodigoFragment profesorIngresarCodigoFragment = new ProfesorIngresarCodigoFragment();
                     fragmentTransaction.replace(R.id.contenido, profesorIngresarCodigoFragment);
-                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.addToBackStack("frag4");
                     fragmentTransaction.commit();
                 }
-                //Es usuario está registrado y con membresia habilitada
+                //Es usuario está registrado y con membresía habilitada
                 else if(usuarioActual.getMembresia().equals(EstadoMembresia.HABILITADA)){
-
+                    fragmentManager = getSupportFragmentManager();
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    ProfesorListaCursosFragment profesorListaCursosFragment = new ProfesorListaCursosFragment();
+                    fragmentTransaction.replace(R.id.contenido, profesorListaCursosFragment);
+                    fragmentTransaction.addToBackStack("frag4");
+                    fragmentTransaction.commit();
                 }
-
                 break;
             case 3:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);

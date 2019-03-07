@@ -1,7 +1,6 @@
 package com.eliascapasso.auxilio.Fragmentos;
 
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,7 @@ import com.eliascapasso.auxilio.R;
 
 import java.util.ArrayList;
 
-public class ProfesorListaCursosFragment extends Fragment {
+public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment {
     private ArrayList<Curso> listaCursos;
     private ListView lvCursos;
 
