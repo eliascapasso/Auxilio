@@ -22,6 +22,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -41,6 +42,7 @@ import com.eliascapasso.auxilio.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -55,19 +57,21 @@ import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class RegistroActivity extends AppCompatActivity{
+    //Constantes
     private static final String CARPETA_PRINCIPAL = "misImagenesApp/";//directorio principal
     private static final String CARPETA_IMAGEN = "imagenes";//carpeta donde se guardan las fotos
     private static final String DIRECTORIO_IMAGEN = CARPETA_PRINCIPAL + CARPETA_IMAGEN;//ruta carpeta de directorios
-    private String path;//almacena la ruta de la imagen
-    File fileImagen;
-    Bitmap bitmap;
-
     private final int MIS_PERMISOS = 100;
     private static final int COD_SELECCIONA = 10;
     private static final int COD_FOTO = 20;
 
+    private String path;//almacena la ruta de la imagen
+    File fileImagen;
+    Bitmap bitmap;
+
     final Calendar myCalendar = Calendar.getInstance();
 
+    //Widgets
     private EditText edtNacimiento;
     private EditText edtDni;
     private EditText edtNombre;
@@ -111,6 +115,180 @@ public class RegistroActivity extends AppCompatActivity{
         fechaNacieminto();
 
         registrarUsuario();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode){
+            case COD_SELECCIONA:
+                if(data != null){
+                    Uri miPath=data.getData();
+                    path = miPath.getPath();
+                    iwFotoPerfil.setImageURI(miPath);
+
+                    try {
+                        bitmap=MediaStore.Images.Media.getBitmap(getContentResolver(),miPath);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case COD_FOTO:
+                MediaScannerConnection.scanFile(RegistroActivity.this, new String[]{path}, null,
+                        new MediaScannerConnection.OnScanCompletedListener() {
+                            @Override
+                            public void onScanCompleted(String path, Uri uri) {
+                                Log.i("Path",""+path);
+                            }
+                        });
+
+                bitmap= BitmapFactory.decodeFile(path);
+                break;
+        }
+
+        if(bitmap != null){
+            //Hace cuadrada la foto
+            bitmap = recortarBitmap(bitmap);
+
+            //creamos el drawable redondeado
+            RoundedBitmapDrawable roundedDrawable =
+                    RoundedBitmapDrawableFactory.create(getResources(), bitmap);
+
+            //asignamos el CornerRadius
+            roundedDrawable.setCornerRadius(bitmap.getHeight());
+
+            iwFotoPerfil.setImageDrawable(roundedDrawable);
+
+            bitmap=redimensionarImagen(bitmap,600,800);
+        }
+    }
+
+    private void registrarUsuario(){
+        btnRegistrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(validarCampos()){
+                    if(bitmap == null){
+                        bitmap = BitmapFactory.decodeResource(RegistroActivity.this.getResources(),
+                                R.drawable.perfil);
+                    }
+
+                    //Sube el usuario a la BD
+                    cargarUsuario();
+                }
+                else{
+                    Toast.makeText(RegistroActivity.this, "Campos inválidos", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void cargarUsuario(){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Cargando...");
+        progressDialog.show();
+
+        //Agrega el usuario a la bd
+        String ip = "192.168.0.3:8080";
+        String url = "http://"+ ip +"/auxilioBD/wsJSONRegistroUsuario.php?";
+        url = url.replace(" ", "%20");
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    progressDialog.hide();
+                    if(response.trim().equalsIgnoreCase("registra")){
+                        Toast.makeText(RegistroActivity.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
+
+                        edtDni.setText("");
+                        edtNombre.setText("");
+                        edtApellido.setText("");
+                        edtCorreo.setText("");
+                        edtNacimiento.setText("");
+                        edtPass.setText("");
+                        edtConfPass.setText("");
+                        iwFotoPerfil.setImageResource(R.drawable.perfil);
+                    }
+                    else{
+                        Toast.makeText(RegistroActivity.this, "No se ha podido registrar el usuario", Toast.LENGTH_SHORT).show();
+                        Log.i("MENSAJE: ",response.toString() + "\n\n\n\n");
+                    }
+                },
+                error -> {
+                    progressDialog.hide();
+                    Toast.makeText(RegistroActivity.this, "No se ha podido conectar al servidor", Toast.LENGTH_SHORT).show();
+                }) {
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("dni", edtDni.getText().toString());
+                params.put("nombre", edtNombre.getText().toString());
+                params.put("apellido", edtApellido.getText().toString());
+                params.put("nacimiento", edtNacimiento.getText().toString());
+                params.put("correo", edtCorreo.getText().toString());
+                params.put("pass", edtNacimiento.getText().toString());
+
+                String fotoPerfil = convertirImgString(bitmap);
+                params.put("foto", fotoPerfil);
+                return params;
+            }
+        };
+
+        request.add(stringRequest);
+    }
+
+    private String convertirImgString(Bitmap bitmap) {
+
+        ByteArrayOutputStream array=new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,array);
+        byte[] imagenByte=array.toByteArray();
+        String imagenString= Base64.encodeToString(imagenByte,Base64.DEFAULT);
+
+        return imagenString;
+    }
+
+    private boolean validarCampos(){
+        if(edtCorreo.getText().toString().length() == 0 ||
+                edtPass.getText().toString().length() == 0 ||
+                edtApellido.getText().toString().length() == 0 ||
+                edtNombre.getText().toString().length() == 0 ||
+                edtDni.getText().toString().length() == 0 ||
+                edtNacimiento.getText().toString().length() == 0 ||
+                edtConfPass.getText().toString().length() == 0){
+            return false;
+        }
+        if(!edtConfPass.getText().toString().equals(edtPass.getText().toString())){
+            return false;
+        }
+
+        Pattern pattern = Patterns.EMAIL_ADDRESS;
+        return pattern.matcher(edtCorreo.getText().toString()).matches();
+    }
+
+    private void fechaNacieminto(){
+        DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear,
+                                  int dayOfMonth) {
+                // TODO Auto-generated method stub
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                actualizarLabel();
+            }
+        };
+
+        edtNacimiento.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO Auto-generated method stub
+                new DatePickerDialog(RegistroActivity.this, date, myCalendar
+                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
     }
 
     private void fotoPerfil() {
@@ -177,52 +355,11 @@ public class RegistroActivity extends AppCompatActivity{
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    private void actualizarLabel() {
+        String myFormat = "MM/dd/yy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("es"));
 
-        switch (requestCode){
-            case COD_SELECCIONA:
-                if(data != null){
-                    Uri miPath=data.getData();
-                    path = miPath.getPath();
-                    iwFotoPerfil.setImageURI(miPath);
-
-                    try {
-                        bitmap=MediaStore.Images.Media.getBitmap(getContentResolver(),miPath);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
-            case COD_FOTO:
-                MediaScannerConnection.scanFile(RegistroActivity.this, new String[]{path}, null,
-                        new MediaScannerConnection.OnScanCompletedListener() {
-                            @Override
-                            public void onScanCompleted(String path, Uri uri) {
-                                Log.i("Path",""+path);
-                            }
-                        });
-
-                bitmap= BitmapFactory.decodeFile(path);
-                break;
-        }
-
-        if(bitmap != null){
-            //Hace cuadrada la foto
-            bitmap = recortarBitmap(bitmap);
-
-            //creamos el drawable redondeado
-            RoundedBitmapDrawable roundedDrawable =
-                    RoundedBitmapDrawableFactory.create(getResources(), bitmap);
-
-            //asignamos el CornerRadius
-            roundedDrawable.setCornerRadius(bitmap.getHeight());
-
-            iwFotoPerfil.setImageDrawable(roundedDrawable);
-
-            bitmap=redimensionarImagen(bitmap,600,800);
-        }
+        edtNacimiento.setText(sdf.format(myCalendar.getTime()).toString());
     }
 
     private Bitmap recortarBitmap(Bitmap original) {
@@ -280,146 +417,6 @@ public class RegistroActivity extends AppCompatActivity{
         }
     }
 
-    private void registrarUsuario(){
-        btnRegistrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(validarCampos()){
-                    cargarUsuario();
-                }
-                else{
-                    Toast.makeText(RegistroActivity.this, "Campos inválidos", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    private void cargarUsuario(){
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Cargando...");
-        progressDialog.show();
-
-        //Agrega el usuario a la bd
-        String ip = "192.168.0.38:8080";
-        String url = "http://"+ ip +"/auxilioBD/wsJSONRegistro.php?";
-        url = url.replace(" ", "%20");
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                response -> {
-                    progressDialog.hide();
-                    Toast.makeText(RegistroActivity.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
-
-                    try {
-                        //converting response to json object
-                        JSONObject obj = new JSONObject(response);
-
-                        //if no error in response
-                        if (!obj.getBoolean("error")) {
-                            Log.i("MENSAJE:", obj.getString("message"));
-                        } else {
-                            Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    edtDni.setText("");
-                    edtNombre.setText("");
-                    edtApellido.setText("");
-                    edtCorreo.setText("");
-                    edtNacimiento.setText("");
-                    edtPass.setText("");
-                    edtConfPass.setText("");
-                },
-                error -> {
-                    progressDialog.hide();
-                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-                }) {
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("nombre", edtNombre.getText().toString());
-                params.put("apellido", edtApellido.getText().toString());
-                params.put("correo", edtCorreo.getText().toString());
-                params.put("nacimiento", edtNacimiento.getText().toString());
-                params.put("pass", edtNacimiento.getText().toString());
-                return params;
-            }
-        };
-
-        request.add(stringRequest);
-    }
-
-    private boolean validarCampos(){
-        if(edtCorreo.getText().toString().length() == 0 ||
-                edtPass.getText().toString().length() == 0 ||
-                edtApellido.getText().toString().length() == 0 ||
-                edtNombre.getText().toString().length() == 0 ||
-                edtDni.getText().toString().length() == 0 ||
-                edtNacimiento.getText().toString().length() == 0 ||
-                edtConfPass.getText().toString().length() == 0){
-            return false;
-        }
-        if(!edtConfPass.getText().toString().equals(edtPass.getText().toString())){
-            return false;
-        }
-
-        Pattern pattern = Patterns.EMAIL_ADDRESS;
-        return pattern.matcher(edtCorreo.getText().toString()).matches();
-    }
-
-    private void fechaNacieminto(){
-        DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear,
-                                  int dayOfMonth) {
-                // TODO Auto-generated method stub
-                myCalendar.set(Calendar.YEAR, year);
-                myCalendar.set(Calendar.MONTH, monthOfYear);
-                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                actualizarLabel();
-            }
-        };
-
-        edtNacimiento.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO Auto-generated method stub
-                new DatePickerDialog(RegistroActivity.this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-    }
-
-    private void actualizarLabel() {
-        String myFormat = "MM/dd/yy"; //In which you need put here
-        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("es"));
-
-        edtNacimiento.setText(sdf.format(myCalendar.getTime()).toString());
-    }
-
-    private boolean solicitaPermisosVersionesSuperiores() {
-        if (Build.VERSION.SDK_INT<Build.VERSION_CODES.M){//validamos si estamos en android menor a 6 para no buscar los permisos
-            return true;
-        }
-
-        //validamos si los permisos ya fueron aceptados
-        if((checkSelfPermission(WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)&&checkSelfPermission(CAMERA)==PackageManager.PERMISSION_GRANTED){
-            return true;
-        }
-
-
-        if ((shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)||(shouldShowRequestPermissionRationale(CAMERA)))){
-            cargarDialogoRecomendacion();
-        }else{
-            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, CAMERA}, MIS_PERMISOS);
-        }
-
-        return false;//implementamos el que procesa el evento dependiendo de lo que se defina aqui
-    }
-
     private void cargarDialogoRecomendacion() {
         AlertDialog.Builder dialogo=new AlertDialog.Builder(this);
         dialogo.setTitle("Permisos Desactivados");
@@ -434,19 +431,6 @@ public class RegistroActivity extends AppCompatActivity{
             }
         });
         dialogo.show();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode==MIS_PERMISOS){
-            if(grantResults.length==2 && grantResults[0]==PackageManager.PERMISSION_GRANTED && grantResults[1]==PackageManager.PERMISSION_GRANTED){//el dos representa los 2 permisos
-                Toast.makeText(this,"Permisos aceptados",Toast.LENGTH_SHORT);
-                btnFotoPerfil.setEnabled(true);
-            }
-        }else{
-            solicitarPermisosManual();
-        }
     }
 
     private void solicitarPermisosManual() {
@@ -471,4 +455,36 @@ public class RegistroActivity extends AppCompatActivity{
         alertOpciones.show();
     }
 
+    private boolean solicitaPermisosVersionesSuperiores() {
+        if (Build.VERSION.SDK_INT<Build.VERSION_CODES.M){//validamos si estamos en android menor a 6 para no buscar los permisos
+            return true;
+        }
+
+        //validamos si los permisos ya fueron aceptados
+        if((checkSelfPermission(WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_GRANTED)&&checkSelfPermission(CAMERA)==PackageManager.PERMISSION_GRANTED){
+            return true;
+        }
+
+
+        if ((shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)||(shouldShowRequestPermissionRationale(CAMERA)))){
+            cargarDialogoRecomendacion();
+        }else{
+            requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE, CAMERA}, MIS_PERMISOS);
+        }
+
+        return false;//implementamos el que procesa el evento dependiendo de lo que se defina aqui
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode==MIS_PERMISOS){
+            if(grantResults.length==2 && grantResults[0]==PackageManager.PERMISSION_GRANTED && grantResults[1]==PackageManager.PERMISSION_GRANTED){//el dos representa los 2 permisos
+                Toast.makeText(this,"Permisos aceptados",Toast.LENGTH_SHORT);
+                btnFotoPerfil.setEnabled(true);
+            }
+        }else{
+            solicitarPermisosManual();
+        }
+    }
 }

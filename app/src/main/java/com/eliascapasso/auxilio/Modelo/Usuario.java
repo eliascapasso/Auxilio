@@ -146,12 +146,16 @@ public class Usuario {
 
     //Metodos de profesor
 
+    public void setCursosProfesor(ArrayList<Curso> cursosProfesor) {
+        this.cursosProfesor = cursosProfesor;
+    }
+
     public ArrayList<Curso> getCursosProfesor() {
         return cursosProfesor;
     }
 
-    public void setCursos(ArrayList<Curso> cursosProfesor) {
-        this.cursosProfesor = cursosProfesor;
+    public void addCursoProfesor(Curso curso){
+        cursosProfesor.add(curso);
     }
 
     public EstadoMembresia getMembresia() {
@@ -184,12 +188,16 @@ public class Usuario {
         return calificacionAlumno;
     }
 
-    public void setCalificacion(Double calificacion) {
+    public void setCalificacionAlumno(Double calificacion) {
         this.calificacionAlumno = calificacionAlumno;
     }
 
     public ArrayList<Curso> getCursosAlumno() {
         return cursosAlumno;
+    }
+
+    public void setCursosAlumno(ArrayList<Curso> cursosAlumno) {
+        this.cursosAlumno = cursosAlumno;
     }
 
     public void addCursoAlumno(Curso cursoAlumno) {
