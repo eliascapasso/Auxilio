@@ -135,6 +135,7 @@ public class LoginActivity extends AppCompatActivity{
                         miUsuario.setNacimiento(jsonObject.optString("nacimiento"));
                         miUsuario.setCorreo(jsonObject.optString("correo"));
                         miUsuario.setPass(jsonObject.optString("pass"));
+                        miUsuario.setDato(jsonObject.optString("foto"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

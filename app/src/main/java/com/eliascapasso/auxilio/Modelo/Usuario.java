@@ -19,7 +19,6 @@ public class Usuario {
     private String pass;
     private String dato;
     private Bitmap fotoPerfil;
-    private String rutaImagen;
 
     //Atributos de profesor
     private ArrayList<Curso> cursosProfesor;
@@ -39,8 +38,6 @@ public class Usuario {
         this.nacimiento = nacimiento;
         this.correo = correo;
         this.pass = pass;
-
-        this.rutaImagen = "";
 
         //Profesor
         this.cursosProfesor = new ArrayList<Curso>();
@@ -86,14 +83,6 @@ public class Usuario {
 
     public void setFotoPerfil(Bitmap fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
-    }
-
-    public String getRutaImagen() {
-        return rutaImagen;
-    }
-
-    public void setRutaImagen(String rutaImagen) {
-        this.rutaImagen = rutaImagen;
     }
 
     public int getDni() {

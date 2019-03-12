@@ -172,6 +172,7 @@ public class GestionUsuarioActivity extends AppCompatActivity{
                                 jsonObject.optString("nacimiento"),
                                 jsonObject.optString("correo"),
                                 jsonObject.optString("pass"));
+                        usuarioActual.setDato(jsonObject.optString("foto"));
 
                         //Setea campos
                         edtDni.setText(String.valueOf(usuarioActual.getDni()));
@@ -180,6 +181,8 @@ public class GestionUsuarioActivity extends AppCompatActivity{
                         edtNacimiento.setText(usuarioActual.getNacimiento());
                         edtCorreo.setText(usuarioActual.getCorreo());
                         edtPass.setText(usuarioActual.getPass());
+
+                        Bitmap foto = redondearFoto(usuarioActual.getFotoPerfil());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -225,20 +228,26 @@ public class GestionUsuarioActivity extends AppCompatActivity{
         }
 
         if(bitmap != null){
-            //Hace cuadrada la foto
-            bitmap = recortarBitmap(bitmap);
-
-            //creamos el drawable redondeado
-            RoundedBitmapDrawable roundedDrawable =
-                    RoundedBitmapDrawableFactory.create(getResources(), bitmap);
-
-            //asignamos el CornerRadius
-            roundedDrawable.setCornerRadius(bitmap.getHeight());
-
-            iwFotoPerfil.setImageDrawable(roundedDrawable);
-
-            bitmap=redimensionarImagen(bitmap,600,800);
+            bitmap = redondearFoto(bitmap);
         }
+    }
+
+    private Bitmap redondearFoto(Bitmap bmap){
+        //Hace cuadrada la foto
+        bmap = recortarBitmap(bmap);
+
+        //creamos el drawable redondeado
+        RoundedBitmapDrawable roundedDrawable =
+                RoundedBitmapDrawableFactory.create(getResources(), bmap);
+
+        //asignamos el CornerRadius
+        roundedDrawable.setCornerRadius(bmap.getHeight());
+
+        iwFotoPerfil.setImageDrawable(roundedDrawable);
+
+        bmap=redimensionarImagen(bmap,600,800);
+
+        return bmap;
     }
 
     private void gestionarUsuario(){
@@ -246,6 +255,7 @@ public class GestionUsuarioActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 if(validarCampos()){
+                    //Si no sube ninguna foto, se setea una imagen por defecto
                     if(bitmap == null){
                         bitmap = BitmapFactory.decodeResource(GestionUsuarioActivity.this.getResources(),
                                 R.drawable.perfil);
