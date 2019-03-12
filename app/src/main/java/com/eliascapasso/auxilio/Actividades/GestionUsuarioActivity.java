@@ -3,8 +3,10 @@ package com.eliascapasso.auxilio.Actividades;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,12 +37,11 @@ import android.widget.Toast;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.eliascapasso.auxilio.Modelo.Usuario;
 import com.eliascapasso.auxilio.R;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -53,10 +54,14 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class RegistroActivity extends AppCompatActivity{
+public class GestionUsuarioActivity extends AppCompatActivity{
     //Constantes
     private static final String CARPETA_PRINCIPAL = "misImagenesApp/";//directorio principal
     private static final String CARPETA_IMAGEN = "imagenes";//carpeta donde se guardan las fotos
@@ -64,6 +69,9 @@ public class RegistroActivity extends AppCompatActivity{
     private final int MIS_PERMISOS = 100;
     private static final int COD_SELECCIONA = 10;
     private static final int COD_FOTO = 20;
+    public static int REGISTRO = 1;
+    public static int ACTUALIZACION = 2;
+    private static String PREFS_KEY = "login_preferences";
 
     private String path;//almacena la ruta de la imagen
     File fileImagen;
@@ -79,16 +87,20 @@ public class RegistroActivity extends AppCompatActivity{
     private EditText edtCorreo;
     private EditText edtPass;
     private EditText edtConfPass;
-    private Button btnRegistrar, btnFotoPerfil;
+    private Button btnAceptar, btnFotoPerfil;
     private ImageView iwFotoPerfil;
 
     private ProgressDialog progressDialog;
     private RequestQueue request;
 
+    private Boolean flagActualizacion;
+
+    private JsonObjectRequest jsonObjectRequest;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registro);
+        setContentView(R.layout.activity_gestion_usuario);
 
         edtNacimiento= (EditText) findViewById(R.id.edtNacimiento);
         edtDni= (EditText) findViewById(R.id.edtDni);
@@ -97,11 +109,35 @@ public class RegistroActivity extends AppCompatActivity{
         edtCorreo= (EditText) findViewById(R.id.edtEmail);
         edtPass= (EditText) findViewById(R.id.edtPassReg);
         edtConfPass= (EditText) findViewById(R.id.edtConfPass);
-        btnRegistrar = (Button) findViewById(R.id.btnRegistrar);
+        btnAceptar = (Button) findViewById(R.id.btnAceptar);
         btnFotoPerfil = (Button) findViewById(R.id.btnFotoPerfil);
         iwFotoPerfil = (ImageView) findViewById(R.id.iwFotoPerfil);
 
+        inicializar();
+
+        fotoPerfil();
+
+        fechaNacieminto();
+
+        gestionarUsuario();
+    }
+
+    private void inicializar() {
         request = Volley.newRequestQueue(this);
+
+        Bundle extras = getIntent().getExtras();
+        int esRegistro = extras.getInt("tipo");
+        if(esRegistro == this.REGISTRO){
+            flagActualizacion = false;
+        }
+        else if (esRegistro == this.ACTUALIZACION){
+            inicializarCampos();
+            flagActualizacion = true;
+        }
+        else{
+            Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         //Permisos
         if(solicitaPermisosVersionesSuperiores()){
@@ -109,12 +145,52 @@ public class RegistroActivity extends AppCompatActivity{
         }else{
             btnFotoPerfil.setEnabled(false);
         }
+    }
 
-        fotoPerfil();
+    private void inicializarCampos() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Cargando...");
+        progressDialog.show();
 
-        fechaNacieminto();
+        //Obtiene el usuario de la bd con el correo
+        String ip = "192.168.0.3:8080";
+        String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" +
+                obtenerLoginSharedPreferencesString(GestionUsuarioActivity.this,"email");
 
-        registrarUsuario();
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                //Se conecta exitosamente
+                response -> {
+                    progressDialog.hide();
+                    JSONArray jsonArray = response.optJSONArray("usuario");
+
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = jsonArray.getJSONObject(0);
+                        Usuario usuarioActual = new Usuario(jsonObject.optInt("dni"),
+                                jsonObject.optString("nombre"),
+                                jsonObject.optString("apellido"),
+                                jsonObject.optString("nacimiento"),
+                                jsonObject.optString("correo"),
+                                jsonObject.optString("pass"));
+
+                        //Setea campos
+                        edtDni.setText(String.valueOf(usuarioActual.getDni()));
+                        edtNombre.setText(usuarioActual.getNombre());
+                        edtApellido.setText(usuarioActual.getApellido());
+                        edtNacimiento.setText(usuarioActual.getNacimiento());
+                        edtCorreo.setText(usuarioActual.getCorreo());
+                        edtPass.setText(usuarioActual.getPass());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                //No se conectar
+                error -> {
+                    progressDialog.hide();
+                    Toast.makeText(GestionUsuarioActivity.this, "Hubo problemas para conectarse con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
+                    Log.i("ERROR: ", error.toString());
+                });
+        request.add(jsonObjectRequest);
     }
 
     @Override
@@ -136,7 +212,7 @@ public class RegistroActivity extends AppCompatActivity{
                 }
                 break;
             case COD_FOTO:
-                MediaScannerConnection.scanFile(RegistroActivity.this, new String[]{path}, null,
+                MediaScannerConnection.scanFile(GestionUsuarioActivity.this, new String[]{path}, null,
                         new MediaScannerConnection.OnScanCompletedListener() {
                             @Override
                             public void onScanCompleted(String path, Uri uri) {
@@ -165,24 +241,34 @@ public class RegistroActivity extends AppCompatActivity{
         }
     }
 
-    private void registrarUsuario(){
-        btnRegistrar.setOnClickListener(new View.OnClickListener() {
+    private void gestionarUsuario(){
+        btnAceptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(validarCampos()){
                     if(bitmap == null){
-                        bitmap = BitmapFactory.decodeResource(RegistroActivity.this.getResources(),
+                        bitmap = BitmapFactory.decodeResource(GestionUsuarioActivity.this.getResources(),
                                 R.drawable.perfil);
                     }
 
-                    //Sube el usuario a la BD
-                    cargarUsuario();
+                    //Si se está registrando un nuevo usuario
+                    if(flagActualizacion){
+                        actualizarUsuario();
+                    }
+                    //si se está actualizando un usuario existente
+                    else {
+                        cargarUsuario();
+                    }
                 }
                 else{
-                    Toast.makeText(RegistroActivity.this, "Campos inválidos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GestionUsuarioActivity.this, "Campos inválidos", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    private void actualizarUsuario() {
+        //Implementar
     }
 
     private void cargarUsuario(){
@@ -199,7 +285,7 @@ public class RegistroActivity extends AppCompatActivity{
                 response -> {
                     progressDialog.hide();
                     if(response.trim().equalsIgnoreCase("registra")){
-                        Toast.makeText(RegistroActivity.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GestionUsuarioActivity.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
 
                         edtDni.setText("");
                         edtNombre.setText("");
@@ -211,13 +297,13 @@ public class RegistroActivity extends AppCompatActivity{
                         iwFotoPerfil.setImageResource(R.drawable.perfil);
                     }
                     else{
-                        Toast.makeText(RegistroActivity.this, "No se ha podido registrar el usuario", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GestionUsuarioActivity.this, "No se ha podido registrar el usuario", Toast.LENGTH_SHORT).show();
                         Log.i("MENSAJE: ",response.toString() + "\n\n\n\n");
                     }
                 },
                 error -> {
                     progressDialog.hide();
-                    Toast.makeText(RegistroActivity.this, "No se ha podido conectar al servidor", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GestionUsuarioActivity.this, "No se ha podido conectar al servidor", Toast.LENGTH_SHORT).show();
                 }) {
 
             @Override
@@ -228,7 +314,7 @@ public class RegistroActivity extends AppCompatActivity{
                 params.put("apellido", edtApellido.getText().toString());
                 params.put("nacimiento", edtNacimiento.getText().toString());
                 params.put("correo", edtCorreo.getText().toString());
-                params.put("pass", edtNacimiento.getText().toString());
+                params.put("pass", edtPass.getText().toString());
 
                 String fotoPerfil = convertirImgString(bitmap);
                 params.put("foto", fotoPerfil);
@@ -284,7 +370,7 @@ public class RegistroActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 // TODO Auto-generated method stub
-                new DatePickerDialog(RegistroActivity.this, date, myCalendar
+                new DatePickerDialog(GestionUsuarioActivity.this, date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
@@ -296,7 +382,7 @@ public class RegistroActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 final CharSequence[] opciones={"Tomar Foto","Elegir de Galeria","Cancelar"};
-                final AlertDialog.Builder builder=new AlertDialog.Builder(RegistroActivity.this);
+                final AlertDialog.Builder builder=new AlertDialog.Builder(GestionUsuarioActivity.this);
                 builder.setTitle("Elige una Opción");
                 builder.setItems(opciones, new DialogInterface.OnClickListener() {
                     @Override
@@ -447,7 +533,7 @@ public class RegistroActivity extends AppCompatActivity{
                     intent.setData(uri);
                     startActivity(intent);
                 }else{
-                    Toast.makeText(RegistroActivity.this,"Los permisos no fueron aceptados",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GestionUsuarioActivity.this,"Los permisos no fueron aceptados",Toast.LENGTH_SHORT).show();
                     dialogInterface.dismiss();
                 }
             }
@@ -486,5 +572,10 @@ public class RegistroActivity extends AppCompatActivity{
         }else{
             solicitarPermisosManual();
         }
+    }
+
+    public static String obtenerLoginSharedPreferencesString(Context context, String keyPref) {
+        SharedPreferences preferences = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
+        return  preferences.getString(keyPref, "");
     }
 }

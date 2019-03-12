@@ -102,7 +102,8 @@ public class LoginActivity extends AppCompatActivity{
         btnRegistrarse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent reg = new Intent(LoginActivity.this, RegistroActivity.class);
+                Intent reg = new Intent(LoginActivity.this, GestionUsuarioActivity.class);
+                reg.putExtra("tipo", GestionUsuarioActivity.REGISTRO);
                 startActivity(reg);
             }
         });
@@ -114,7 +115,7 @@ public class LoginActivity extends AppCompatActivity{
         progressDialog.show();
 
         //Obtiene el usuario de la bd con el correo
-        String ip = "192.168.0.18:8080";
+        String ip = "192.168.0.3:8080";
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" + edtEmail.getText().toString();
 
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -154,7 +155,7 @@ public class LoginActivity extends AppCompatActivity{
                 //No se conectar
                 error -> {
                     progressDialog.hide();
-                    Toast.makeText(LoginActivity.this, "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Hubo problemas para conectarse con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
                     Log.i("ERROR: ", error.toString());
                 });
         request.add(jsonObjectRequest);

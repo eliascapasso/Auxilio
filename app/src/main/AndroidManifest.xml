@@ -26,7 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Actividades.MainActivity"></activity>
-        <activity android:name=".Actividades.RegistroActivity"></activity>
+        <activity android:name=".Actividades.GestionUsuarioActivity"></activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

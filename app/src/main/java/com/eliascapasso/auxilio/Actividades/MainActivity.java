@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.show();
 
         //Obtiene el usuario de la bd con el correo
-        String ip = "192.168.0.18:8080";
+        String ip = "192.168.0.3:8080";
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" +
                 obtenerLoginSharedPreferencesString(MainActivity.this,"email");
 
@@ -122,11 +122,16 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.optMiPerfil:
-                                getSupportFragmentManager().beginTransaction().
+
+                                Intent reg = new Intent(MainActivity.this, GestionUsuarioActivity.class);
+                                reg.putExtra("tipo", GestionUsuarioActivity.ACTUALIZACION);
+                                startActivity(reg);
+
+                                /*getSupportFragmentManager().beginTransaction().
                                         remove(getSupportFragmentManager().findFragmentById(R.id.contenido)).commit();
                                 menuItem.setChecked(true);
                                 setFragment(0);
-                                drawerLayout.closeDrawer(GravityCompat.START);
+                                drawerLayout.closeDrawer(GravityCompat.START);*/
                                 return true;
                             case R.id.optAlumno:
                                 getSupportFragmentManager().beginTransaction().
