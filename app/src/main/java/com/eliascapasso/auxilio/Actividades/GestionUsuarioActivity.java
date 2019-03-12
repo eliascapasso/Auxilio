@@ -37,6 +37,8 @@ import android.widget.Toast;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -148,19 +150,14 @@ public class GestionUsuarioActivity extends AppCompatActivity{
     }
 
     private void inicializarCampos() {
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Cargando...");
-        progressDialog.show();
-
         //Obtiene el usuario de la bd con el correo
-        String ip = "192.168.0.3:8080";
+        String ip = getString(R.string.ip);
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" +
                 obtenerLoginSharedPreferencesString(GestionUsuarioActivity.this,"email");
 
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 //Se conecta exitosamente
                 response -> {
-                    progressDialog.hide();
                     JSONArray jsonArray = response.optJSONArray("usuario");
 
                     JSONObject jsonObject = null;
@@ -182,14 +179,13 @@ public class GestionUsuarioActivity extends AppCompatActivity{
                         edtCorreo.setText(usuarioActual.getCorreo());
                         edtPass.setText(usuarioActual.getPass());
 
-                        Bitmap foto = redondearFoto(usuarioActual.getFotoPerfil());
+                        bitmap = redondearFoto(usuarioActual.getFotoPerfil());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 },
                 //No se conectar
                 error -> {
-                    progressDialog.hide();
                     Toast.makeText(GestionUsuarioActivity.this, "Hubo problemas para conectarse con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
                     Log.i("ERROR: ", error.toString());
                 });
@@ -264,6 +260,7 @@ public class GestionUsuarioActivity extends AppCompatActivity{
                     //Si se está registrando un nuevo usuario
                     if(flagActualizacion){
                         actualizarUsuario();
+                        finish();
                     }
                     //si se está actualizando un usuario existente
                     else {
@@ -278,7 +275,52 @@ public class GestionUsuarioActivity extends AppCompatActivity{
     }
 
     private void actualizarUsuario() {
-        //Implementar
+        progressDialog =new ProgressDialog(this);
+        progressDialog.setMessage("Cargando...");
+        progressDialog.show();
+
+        String ip=getString(R.string.ip);
+
+        String url="http://"+ ip +"/auxilioBD/wsJSONActualizarUsuario.php?";
+
+        StringRequest stringRequest =new StringRequest(Request.Method.POST, url,
+                response -> {
+                    progressDialog.hide();
+
+                    if (response.trim().equalsIgnoreCase("actualiza")){
+                        Toast.makeText(GestionUsuarioActivity.this,"Se ha Actualizado con exito",Toast.LENGTH_SHORT).show();
+                        Log.i("RESPUESTA: ",""+response);
+
+                        guardarLoginSharedPreferences(edtCorreo.getText().toString(), edtPass.getText().toString());
+                    }else{
+                        Toast.makeText(GestionUsuarioActivity.this,"No se ha Actualizado ",Toast.LENGTH_SHORT).show();
+                        Log.i("RESPUESTA: ",""+response);
+                    }
+
+                },
+                error -> {
+                    Toast.makeText(GestionUsuarioActivity.this,"No se ha podido conectar",Toast.LENGTH_SHORT).show();
+                    Log.i("ERROR: ", error.toString());
+                    progressDialog.hide();
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("dni", edtDni.getText().toString());
+                params.put("nombre", edtNombre.getText().toString());
+                params.put("apellido", edtApellido.getText().toString());
+                params.put("nacimiento", edtNacimiento.getText().toString());
+                params.put("correo", edtCorreo.getText().toString());
+                params.put("pass", edtPass.getText().toString());
+
+                String fotoPerfil = convertirImgString(bitmap);
+                params.put("foto", fotoPerfil);
+
+                return params;
+            }
+        };
+        request.add(stringRequest);
+        //VolleySingleton.getIntanciaVolley(GestionUsuarioActivity.this).addToRequestQueue(stringRequest);
     }
 
     private void cargarUsuario(){
@@ -287,7 +329,7 @@ public class GestionUsuarioActivity extends AppCompatActivity{
         progressDialog.show();
 
         //Agrega el usuario a la bd
-        String ip = "192.168.0.3:8080";
+        String ip = getString(R.string.ip);
         String url = "http://"+ ip +"/auxilioBD/wsJSONRegistroUsuario.php?";
         url = url.replace(" ", "%20");
 
@@ -346,6 +388,7 @@ public class GestionUsuarioActivity extends AppCompatActivity{
     }
 
     private boolean validarCampos(){
+
         if(edtCorreo.getText().toString().length() == 0 ||
                 edtPass.getText().toString().length() == 0 ||
                 edtApellido.getText().toString().length() == 0 ||
@@ -355,6 +398,11 @@ public class GestionUsuarioActivity extends AppCompatActivity{
                 edtConfPass.getText().toString().length() == 0){
             return false;
         }
+
+        if(edtDni.getText().toString().length() != 8){
+            return false;
+        }
+
         if(!edtConfPass.getText().toString().equals(edtPass.getText().toString())){
             return false;
         }
@@ -587,5 +635,15 @@ public class GestionUsuarioActivity extends AppCompatActivity{
     public static String obtenerLoginSharedPreferencesString(Context context, String keyPref) {
         SharedPreferences preferences = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
         return  preferences.getString(keyPref, "");
+    }
+
+    private void guardarLoginSharedPreferences(String email, String pass) {
+        SharedPreferences sharedPref = getSharedPreferences("login_preferences", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("email", email);
+        editor.putString("pass", pass);
+
+        editor.apply();
+        editor.commit();
     }
 }

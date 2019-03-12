@@ -115,7 +115,7 @@ public class LoginActivity extends AppCompatActivity{
         progressDialog.show();
 
         //Obtiene el usuario de la bd con el correo
-        String ip = "192.168.0.3:8080";
+        String ip = getString(R.string.ip);
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" + edtEmail.getText().toString();
 
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
