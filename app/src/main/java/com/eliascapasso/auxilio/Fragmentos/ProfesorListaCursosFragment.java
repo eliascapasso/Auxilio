@@ -42,7 +42,7 @@ public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment
     private void obtenerCursos() {
         //Implementar
 
-        Curso curso = new Curso("Algebra Lineal","06/03/2019", 1050, 20, (float) 3.5, 1);
+        Curso curso = new Curso("Algebra Lineal","06/03/2019", 1050, 20, 3.5, 1);
 
         listaCursos.add(curso);
     }

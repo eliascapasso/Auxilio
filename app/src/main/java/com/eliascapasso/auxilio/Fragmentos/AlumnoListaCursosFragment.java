@@ -1,21 +1,36 @@
 package com.eliascapasso.auxilio.Fragmentos;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.eliascapasso.auxilio.Adaptadores.AdaptadorCursos;
 import com.eliascapasso.auxilio.Modelo.Curso;
 import com.eliascapasso.auxilio.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
     private ArrayList<Curso> listaCursos;
     private ListView lvCursos;
+
+    ProgressDialog progressDialog;
+
+    RequestQueue request;
+    JsonObjectRequest jsonObjectRequest;
 
     public AlumnoListaCursosFragment() {
 
@@ -33,6 +48,8 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
 
         lvCursos = (ListView) view.findViewById(R.id.lstCursosAlumno);
 
+        request = Volley.newRequestQueue(getContext());
+
         inicializarAtributos(view);
 
         return view;
@@ -41,14 +58,57 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
     private void inicializarAtributos(View v){
         listaCursos = new ArrayList<Curso>();
         obtenerCursos();
-        lvCursos.setAdapter(new AdaptadorCursos(v.getContext(), listaCursos));
     }
 
     private void obtenerCursos() {
-        //Implementar
+        progressDialog=new ProgressDialog(getContext());
+        progressDialog.setMessage("Consultando...");
+        progressDialog.show();
 
-        Curso curso = new Curso("Algebra Lineal","06/03/2019", 1050, 20, (float) 3.5, 1);
+        String ip=getString(R.string.ip);
 
-        listaCursos.add(curso);
+        String url="http://"+ ip +"/auxilioBD/wsJSONConsultarListaCursos.php";
+
+        jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                //Se conecta exitosamente
+                response -> {
+                    Curso curso=null;
+
+                    JSONArray json=response.optJSONArray("curso");
+
+                    try {
+
+                        for (int i=0;i<json.length();i++){
+                            curso = new Curso();
+                            JSONObject jsonObject=null;
+                            jsonObject=json.getJSONObject(i);
+
+                            curso.setTitulo(jsonObject.optString("titulo"));
+                            curso.setDescripcion(jsonObject.optString("descripcion"));
+                            curso.setFecha(jsonObject.optString("fecha"));
+                            curso.setCosto(jsonObject.optInt("costo"));
+                            curso.setCupos(jsonObject.optInt("cupos"));
+                            curso.setCalificacion(jsonObject.optDouble("calificacion"));
+                            curso.setDuracion(jsonObject.optString("duracion"));
+                            curso.setDni_profesor(jsonObject.optInt("dni_profesor"));
+                            listaCursos.add(curso);
+                        }
+                        progressDialog.hide();
+                        lvCursos.setAdapter(new AdaptadorCursos(getView().getContext(), listaCursos));
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getContext(), "No se ha podido establecer conexión con el servidor" +
+                                " "+response, Toast.LENGTH_LONG).show();
+                        progressDialog.hide();
+                    }
+                },
+                //No se conectar
+                error -> {
+                    progressDialog.hide();
+                    Toast.makeText(getContext(), "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
+                    Log.i("ERROR: ", error.toString());
+                });
+        request.add(jsonObjectRequest);
     }
 }

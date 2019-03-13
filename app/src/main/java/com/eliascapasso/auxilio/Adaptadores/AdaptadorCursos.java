@@ -46,7 +46,7 @@ public class AdaptadorCursos extends BaseAdapter {
 
         cursoHolder.tvTituloCurso.setText(listaCursos.get(i).getTitulo());
         cursoHolder.tvCostoCurso.setText("Bs" + listaCursos.get(i).getCosto());
-        cursoHolder.rtgCalificacion.setRating(listaCursos.get(i).getCalificacion());
+        cursoHolder.rtgCalificacion.setRating(listaCursos.get(i).getCalificacion().floatValue());
         cursoHolder.rtgCalificacion.setIsIndicator(true);
 
         return view;

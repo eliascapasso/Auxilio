@@ -3,21 +3,26 @@ package com.eliascapasso.auxilio.Modelo;
 public class Curso {
     private static int idCurso = 0;
     private String titulo;
+    private String descripcion;
     private String fecha;
     private int costo;
     private int cupos;
-    private Float calificacion;
+    private Double calificacion;
     private String duracion;
-    private int idProfesor;
+    private int dni_profesor;
 
-    public Curso(String titulo, String fecha, int costo, int cupos, Float calificacion, int idProfesor) {
+    public Curso(String titulo, String fecha, int costo, int cupos, Double calificacion, int dni_profesor) {
         idCurso++;
         this.titulo = titulo;
         this.fecha = fecha;
         this.costo = costo;
         this.cupos = cupos;
         this.calificacion = calificacion;
-        this.idProfesor = idProfesor;
+        this.dni_profesor = dni_profesor;
+    }
+
+    public Curso(){
+        idCurso++;
     }
 
     public static int getIdCurso() {
@@ -34,6 +39,14 @@ public class Curso {
 
     public void setTitulo(String titulo) {
         this.titulo = titulo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public String getDuracion() {
@@ -68,19 +81,19 @@ public class Curso {
         this.cupos = cupos;
     }
 
-    public Float getCalificacion() {
+    public Double getCalificacion() {
         return calificacion;
     }
 
-    public void setCalificacion(Float calificacion) {
+    public void setCalificacion(Double calificacion) {
         this.calificacion = calificacion;
     }
 
-    public int getIdProfesor() {
-        return idProfesor;
+    public int getDni_profesor() {
+        return dni_profesor;
     }
 
-    public void setIdProfesor(int idProfesor) {
-        this.idProfesor = idProfesor;
+    public void setDni_profesor(int dni_profesor) {
+        this.dni_profesor = dni_profesor;
     }
 }
