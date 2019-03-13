@@ -26,7 +26,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
 import com.eliascapasso.auxilio.Fragmentos.AlumnoListaCursosFragment;
-import com.eliascapasso.auxilio.Fragmentos.EditarPerfilFragment;
 import com.eliascapasso.auxilio.Fragmentos.ProfesorIngresarCodigoFragment;
 import com.eliascapasso.auxilio.Fragmentos.ProfesorListaCursosFragment;
 import com.eliascapasso.auxilio.Fragmentos.SolicitarCredencialFragment;
@@ -169,14 +168,6 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager;
         FragmentTransaction fragmentTransaction;
         switch (position) {
-            case 0:
-                fragmentManager = getSupportFragmentManager();
-                fragmentTransaction = fragmentManager.beginTransaction();
-                EditarPerfilFragment editarPerfilFragment = new EditarPerfilFragment();
-                fragmentTransaction.replace(R.id.contenido, editarPerfilFragment);
-                fragmentTransaction.addToBackStack("frag1");
-                fragmentTransaction.commit();
-                break;
             case 1:
                 fragmentManager = getSupportFragmentManager();
                 fragmentTransaction = fragmentManager.beginTransaction();

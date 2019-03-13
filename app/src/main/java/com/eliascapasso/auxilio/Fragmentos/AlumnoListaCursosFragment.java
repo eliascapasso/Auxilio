@@ -103,7 +103,7 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
                         progressDialog.hide();
                     }
                 },
-                //No se conectar
+                //No se conecta
                 error -> {
                     progressDialog.hide();
                     Toast.makeText(getContext(), "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
