@@ -102,6 +102,20 @@ public class MainActivity extends AppCompatActivity {
                                 jsonObject.optString("nacimiento"),
                                 jsonObject.optString("correo"),
                                 jsonObject.optString("pass"));
+                        usuarioActual.setDato(jsonObject.optString("foto"));
+
+                        switch (jsonObject.optString("estado_membresia_profesor")){
+                            case "DESHABILITADA":
+                                usuarioActual.setMembresia(EstadoMembresia.DESHABILITADA);
+                                break;
+                            case "HABILITADA":
+                                usuarioActual.setMembresia(EstadoMembresia.HABILITADA);
+                                break;
+                            case "EN_ESPERA":
+                                usuarioActual.setMembresia(EstadoMembresia.EN_ESPERA);
+                                break;
+                        }
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -122,16 +136,9 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.optMiPerfil:
-
                                 Intent reg = new Intent(MainActivity.this, GestionUsuarioActivity.class);
                                 reg.putExtra("tipo", GestionUsuarioActivity.ACTUALIZACION);
                                 startActivity(reg);
-
-                                /*getSupportFragmentManager().beginTransaction().
-                                        remove(getSupportFragmentManager().findFragmentById(R.id.contenido)).commit();
-                                menuItem.setChecked(true);
-                                setFragment(0);
-                                drawerLayout.closeDrawer(GravityCompat.START);*/
                                 return true;
                             case R.id.optAlumno:
                                 getSupportFragmentManager().beginTransaction().
@@ -185,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                     fragmentTransaction = fragmentManager.beginTransaction();
                     SolicitarCredencialFragment solicitarCredencialFragment = new SolicitarCredencialFragment();
                     fragmentTransaction.replace(R.id.contenido, solicitarCredencialFragment);
-                    fragmentTransaction.addToBackStack("frag3");
+                    //fragmentTransaction.addToBackStack("frag3");
                     fragmentTransaction.commit();
                 }
                 //El usuario se registró como profesor, pero aún no asistió a la reunion
@@ -194,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                     fragmentTransaction = fragmentManager.beginTransaction();
                     ProfesorIngresarCodigoFragment profesorIngresarCodigoFragment = new ProfesorIngresarCodigoFragment();
                     fragmentTransaction.replace(R.id.contenido, profesorIngresarCodigoFragment);
-                    fragmentTransaction.addToBackStack("frag4");
+                    //fragmentTransaction.addToBackStack("frag4");
                     fragmentTransaction.commit();
                 }
                 //Es usuario está registrado y con membresía habilitada
@@ -203,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
                     fragmentTransaction = fragmentManager.beginTransaction();
                     ProfesorListaCursosFragment profesorListaCursosFragment = new ProfesorListaCursosFragment();
                     fragmentTransaction.replace(R.id.contenido, profesorListaCursosFragment);
-                    fragmentTransaction.addToBackStack("frag4");
+                    //fragmentTransaction.addToBackStack("frag4");
                     fragmentTransaction.commit();
                 }
                 break;

@@ -173,7 +173,6 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
                             );
 
                             //Cambia el estado de la credencial del profesor
-                            usuarioActual.setMembresia(EstadoMembresia.EN_ESPERA);
                             actualizarUsuario(usuarioActual);
 
                             FragmentManager fragmentManager;
@@ -224,6 +223,8 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 params.put("dni", String.valueOf(usuarioActual.getDni()));
+
+                //Cambia el estado de la membresia
                 params.put("estado_membresia_profesor", String.valueOf(EstadoMembresia.EN_ESPERA));
 
                 return params;
@@ -258,6 +259,18 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
                                 jsonObject.optString("correo"),
                                 jsonObject.optString("pass"));
                         usuarioActual.setDato(jsonObject.optString("foto"));
+
+                        switch (jsonObject.optString("estado_membresia_profesor")){
+                            case "DESHABILITADA":
+                                usuarioActual.setMembresia(EstadoMembresia.DESHABILITADA);
+                                break;
+                            case "HABILITADA":
+                                usuarioActual.setMembresia(EstadoMembresia.HABILITADA);
+                                break;
+                            case "EN_ESPERA":
+                                usuarioActual.setMembresia(EstadoMembresia.EN_ESPERA);
+                                break;
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
