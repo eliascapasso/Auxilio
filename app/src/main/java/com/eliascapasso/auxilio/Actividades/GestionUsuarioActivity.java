@@ -42,6 +42,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
 import com.eliascapasso.auxilio.Modelo.Usuario;
 import com.eliascapasso.auxilio.R;
 
@@ -225,6 +226,7 @@ public class GestionUsuarioActivity extends AppCompatActivity{
 
         if(bitmap != null){
             bitmap = redondearFoto(bitmap);
+            bitmap=redimensionarImagen(bitmap,600,800);
         }
     }
 
@@ -240,8 +242,6 @@ public class GestionUsuarioActivity extends AppCompatActivity{
         roundedDrawable.setCornerRadius(bmap.getHeight());
 
         iwFotoPerfil.setImageDrawable(roundedDrawable);
-
-        bmap=redimensionarImagen(bmap,600,800);
 
         return bmap;
     }
@@ -315,7 +315,6 @@ public class GestionUsuarioActivity extends AppCompatActivity{
 
                 String fotoPerfil = convertirImgString(bitmap);
                 params.put("foto", fotoPerfil);
-
                 return params;
             }
         };

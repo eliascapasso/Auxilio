@@ -6,9 +6,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,10 +20,13 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.eliascapasso.auxilio.Actividades.GestionUsuarioActivity;
 import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
 import com.eliascapasso.auxilio.Modelo.MailJob;
 import com.eliascapasso.auxilio.Modelo.Usuario;
@@ -31,9 +36,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -186,7 +194,43 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
     }
 
     private void actualizarUsuario(Usuario usuarioActual) {
-        //Implementar
+        progressDialog =new ProgressDialog(getContext());
+        progressDialog.setMessage("Cargando...");
+        progressDialog.show();
+
+        String ip=getString(R.string.ip);
+
+        String url="http://"+ ip +"/auxilioBD/wsJSONActualizarProfesor.php?";
+
+        StringRequest stringRequest =new StringRequest(Request.Method.POST, url,
+                response -> {
+                    progressDialog.hide();
+
+                    if (response.trim().equalsIgnoreCase("actualiza")){
+                        Toast.makeText(getContext(),"Se ha Actualizado con exito",Toast.LENGTH_SHORT).show();
+                        Log.i("RESPUESTA: ",""+response);
+
+                    }else{
+                        Toast.makeText(getContext(),"No se ha Actualizado ",Toast.LENGTH_SHORT).show();
+                        Log.i("RESPUESTA: ",""+response);
+                    }
+                },
+                error -> {
+                    Toast.makeText(getContext(),"No se ha podido conectar",Toast.LENGTH_SHORT).show();
+                    Log.i("ERROR: ", error.toString());
+                    progressDialog.hide();
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("dni", String.valueOf(usuarioActual.getDni()));
+                params.put("estado_membresia_profesor", String.valueOf(EstadoMembresia.EN_ESPERA));
+
+                return params;
+            }
+        };
+        request.add(stringRequest);
+        //VolleySingleton.getIntanciaVolley(GestionUsuarioActivity.this).addToRequestQueue(stringRequest);
     }
 
     private void obtenerUsuario() {
@@ -195,7 +239,7 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
         progressDialog.show();
 
         //Obtiene el usuario de la bd con el correo
-        String ip = "192.168.0.18:8080";
+        String ip = getString(R.string.ip);
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" + obtenerLoginSharedPreferencesString(getContext(),"email");
 
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -213,6 +257,7 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
                                 jsonObject.optString("nacimiento"),
                                 jsonObject.optString("correo"),
                                 jsonObject.optString("pass"));
+                        usuarioActual.setDato(jsonObject.optString("foto"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
