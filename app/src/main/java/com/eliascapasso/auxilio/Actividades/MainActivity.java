@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.show();
 
         //Obtiene el usuario de la bd con el correo
-        String ip = "192.168.0.3:8080";
+        String ip = getString(R.string.ip);
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" +
                 obtenerLoginSharedPreferencesString(MainActivity.this,"email");
 
@@ -122,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
                 //No se conectar
                 error -> {
                     progressDialog.hide();
-                    Toast.makeText(MainActivity.this, "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
                     Log.i("ERROR: ", error.toString());
                 });
         request.add(jsonObjectRequest);

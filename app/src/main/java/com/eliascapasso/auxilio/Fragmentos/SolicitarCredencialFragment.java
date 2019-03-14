@@ -206,16 +206,13 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
                     progressDialog.hide();
 
                     if (response.trim().equalsIgnoreCase("actualiza")){
-                        Toast.makeText(getContext(),"Se ha Actualizado con exito",Toast.LENGTH_SHORT).show();
                         Log.i("RESPUESTA: ",""+response);
 
                     }else{
-                        Toast.makeText(getContext(),"No se ha Actualizado ",Toast.LENGTH_SHORT).show();
                         Log.i("RESPUESTA: ",""+response);
                     }
                 },
                 error -> {
-                    Toast.makeText(getContext(),"No se ha podido conectar",Toast.LENGTH_SHORT).show();
                     Log.i("ERROR: ", error.toString());
                     progressDialog.hide();
                 }){
@@ -278,7 +275,6 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
                 //No se conectar
                 error -> {
                     progressDialog.hide();
-                    Toast.makeText(getContext(), "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
                     Log.i("ERROR: ", error.toString());
                 });
         request.add(jsonObjectRequest);

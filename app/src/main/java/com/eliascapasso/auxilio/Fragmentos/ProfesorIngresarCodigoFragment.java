@@ -174,7 +174,6 @@ public class ProfesorIngresarCodigoFragment extends android.support.v4.app.Fragm
                 //No se conectar
                 error -> {
                     progressDialog.hide();
-                    Toast.makeText(getContext(), "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
                     Log.i("ERROR: ", error.toString());
                 });
         request.add(jsonObjectRequest);

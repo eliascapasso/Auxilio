@@ -24,7 +24,15 @@
             android:id="@+id/busqueda"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#f0efef"/>
+            android:background="#f0efef" />
+
+        <ToggleButton
+            android:id="@+id/tgBtnFiltroCursos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Filtro cursos"
+            android:textOff="Todos los cursos"
+            android:textOn="Mis cursos" />
 
         <ListView
             android:id="@+id/lstCursosAlumno"

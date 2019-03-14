@@ -1,7 +1,7 @@
 package com.eliascapasso.auxilio.Modelo;
 
 public class Curso {
-    private static int idCurso = 0;
+    private  int idCurso;
     private String titulo;
     private String descripcion;
     private String fecha;
@@ -12,7 +12,6 @@ public class Curso {
     private int dni_profesor;
 
     public Curso(String titulo, String fecha, int costo, int cupos, Double calificacion, int dni_profesor) {
-        idCurso++;
         this.titulo = titulo;
         this.fecha = fecha;
         this.costo = costo;
@@ -22,15 +21,15 @@ public class Curso {
     }
 
     public Curso(){
-        idCurso++;
+
     }
 
-    public static int getIdCurso() {
+    public int getIdCurso() {
         return idCurso;
     }
 
-    public static void setIdCurso(int idCurso) {
-        Curso.idCurso = idCurso;
+    public void setIdCurso(int idCurso) {
+        this.idCurso = idCurso;
     }
 
     public String getTitulo() {

@@ -52,17 +52,11 @@ public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment
         lvCursos = (ListView) view.findViewById(R.id.lstCursosProfesor);
 
         request = Volley.newRequestQueue(getContext());
+        listaCursos = new ArrayList<Curso>();
 
-        obtenerUsuario();
-
-        inicializarAtributos(view);
+        inicializarAtributos();
 
         return view;
-    }
-
-    private void inicializarAtributos(View v){
-        listaCursos = new ArrayList<Curso>();
-        obtenerCursos();
     }
 
     private void obtenerCursos() {
@@ -101,19 +95,16 @@ public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment
 
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        Toast.makeText(getContext(), "No se ha podido establecer conexión con el servidor" +
-                                " "+response, Toast.LENGTH_LONG).show();
                     }
                 },
                 //No se conecta
                 error -> {
-                    Toast.makeText(getContext(), "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
                     Log.i("ERROR: ", error.toString());
                 });
         request.add(jsonObjectRequest);
     }
 
-    private void obtenerUsuario() {
+    private void inicializarAtributos() {
         //Obtiene el usuario de la bd con el correo
         String ip = getString(R.string.ip);
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" + obtenerLoginSharedPreferencesString(getContext(),"email");
@@ -145,13 +136,16 @@ public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment
                                 usuarioActual.setMembresia(EstadoMembresia.EN_ESPERA);
                                 break;
                         }
+
+                        //Obtiene todos los cursos
+                        obtenerCursos();
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 },
                 //No se conectar
                 error -> {
-                    Toast.makeText(getContext(), "No se pudo conectar con el servidor: " + error.toString()  , Toast.LENGTH_SHORT).show();
                     Log.i("ERROR: ", error.toString());
                 });
         request.add(jsonObjectRequest);
