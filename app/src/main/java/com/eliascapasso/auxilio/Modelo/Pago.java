@@ -1,30 +1,23 @@
 package com.eliascapasso.auxilio.Modelo;
 
 import com.eliascapasso.auxilio.Enumerados.EstadoPago;
+import com.eliascapasso.auxilio.Enumerados.TipoPago;
 
 public class Pago {
-    private int dni_usuario;
-    private int id_curso;
+    private int id_pago;
+    private TipoPago tipo;
     private EstadoPago estado;
 
     public Pago() {
         this.estado = EstadoPago.NO_PAGADO;
     }
 
-    public int getDni_usuario() {
-        return dni_usuario;
+    public int getId_pago() {
+        return id_pago;
     }
 
-    public void setDni_usuario(int dni_usuario) {
-        this.dni_usuario = dni_usuario;
-    }
-
-    public int getId_curso() {
-        return id_curso;
-    }
-
-    public void setId_curso(int id_curso) {
-        this.id_curso = id_curso;
+    public void setId_pago(int id_pago) {
+        this.id_pago = id_pago;
     }
 
     public EstadoPago getEstado() {
