@@ -7,30 +7,34 @@
     android:background="#dfdcdc"
     tools:context=".Fragmentos.AlumnoListaCursosFragment">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/texw12"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Cursos como profesor"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/texw12"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Cursos como profesor"
-            android:textAlignment="center"
-            android:textColor="@android:color/black" />
+    <SearchView
+        android:id="@+id/busqueda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#f0efef"
+        app:layout_constraintTop_toBottomOf="@+id/texw12"
+        tools:ignore="MissingConstraints">
 
-        <SearchView
-            android:id="@+id/busqueda"
-            android:background="#f0efef"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent" />
+    </SearchView>
 
-        <ListView
-            android:id="@+id/lstCursosProfesor"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+    <ListView
+        android:id="@+id/lstCursosProfesor"
+        android:layout_width="match_parent"
+        android:layout_height="499dp"
+        app:layout_constraintTop_toBottomOf="@+id/busqueda"
+        tools:layout_editor_absoluteX="0dp"
+        tools:ignore="MissingConstraints">
+    </ListView>
 
-    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

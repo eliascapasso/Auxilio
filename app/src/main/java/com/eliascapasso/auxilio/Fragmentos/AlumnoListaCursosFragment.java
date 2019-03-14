@@ -88,7 +88,6 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
         jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 //Se conecta exitosamente
                 response -> {
-                    progressDialog.hide();
                     JSONArray jsonArray = response.optJSONArray("usuario");
 
                     JSONObject jsonObject = null;
@@ -129,10 +128,6 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
     }
 
     private void obtenerAlumnosCursos(){
-        progressDialog=new ProgressDialog(getContext());
-        progressDialog.setMessage("Consultando...");
-        progressDialog.show();
-
         String ip=getString(R.string.ip);
 
         String url="http://"+ ip +"/auxilioBD/wsJSONConsultarListaAlumnosCursos.php";
@@ -157,7 +152,6 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
 
                             listaAlumnosCursos.add(alumnoCurso);
                         }
-                        progressDialog.hide();
 
                         obtenerCursos();
 
@@ -179,10 +173,6 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
     }
 
     private void obtenerCursos() {
-        progressDialog=new ProgressDialog(getContext());
-        progressDialog.setMessage("Consultando...");
-        progressDialog.show();
-
         String ip=getString(R.string.ip);
 
         String url="http://"+ ip +"/auxilioBD/wsJSONConsultarListaCursos.php";

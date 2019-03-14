@@ -4,8 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -41,6 +44,13 @@ public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment
 
     public ProfesorListaCursosFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -154,5 +164,11 @@ public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment
     public static String obtenerLoginSharedPreferencesString(Context context, String keyPref) {
         SharedPreferences preferences = context.getSharedPreferences(PREFS_KEY, MODE_PRIVATE);
         return  preferences.getString(keyPref, "");
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.action_bar_main, menu);
+        super.onCreateOptionsMenu(menu,inflater);
     }
 }
