@@ -6,6 +6,7 @@ import android.util.Base64;
 
 import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -63,7 +64,6 @@ public class Usuario {
 
         try {
             byte[] byteCode= Base64.decode(dato,Base64.DEFAULT);
-            //this.imagen= BitmapFactory.decodeByteArray(byteCode,0,byteCode.length);
 
             int alto=100;//alto en pixeles
             int ancho=150;//ancho en pixeles
@@ -83,6 +83,13 @@ public class Usuario {
 
     public void setFotoPerfil(Bitmap fotoPerfil) {
         this.fotoPerfil = fotoPerfil;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        fotoPerfil.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String dato = android.util.Base64.encodeToString(imageBytes, Base64.DEFAULT);
+
+        this.dato = dato;
     }
 
     public int getDni() {

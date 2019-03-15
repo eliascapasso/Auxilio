@@ -153,7 +153,7 @@ public class GestionUsuarioActivity extends AppCompatActivity{
         }
     }
 
-    private void inicializarCampos() {
+    private void obtenerUsuario() {
         usuarioActual.setDni(Integer.parseInt(obtenerLoginSharedPreferencesString(this, "dni")));
         usuarioActual.setNombre(obtenerLoginSharedPreferencesString(this, "nombre"));
         usuarioActual.setApellido(obtenerLoginSharedPreferencesString(this, "apellido"));
@@ -161,16 +161,9 @@ public class GestionUsuarioActivity extends AppCompatActivity{
         usuarioActual.setCorreo(obtenerLoginSharedPreferencesString(this, "correo"));
         usuarioActual.setPass(obtenerLoginSharedPreferencesString(this, "pass"));
         usuarioActual.setDato(obtenerLoginSharedPreferencesString(this, "dato"));
-
-        edtDni.setText(String.valueOf(usuarioActual.getDni()));
-        edtNombre.setText(usuarioActual.getNombre());
-        edtApellido.setText(usuarioActual.getApellido());
-        edtNacimiento.setText(usuarioActual.getNacimiento());
-        edtCorreo.setText(usuarioActual.getCorreo());
-        edtPass.setText(usuarioActual.getPass());
     }
 
-    private void obtenerUsuario() {
+    private void inicializarCampos() {
         //Obtiene el usuario de la bd con el correo
         String ip = getString(R.string.ip);
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" +
@@ -184,13 +177,25 @@ public class GestionUsuarioActivity extends AppCompatActivity{
                     JSONObject jsonObject = null;
                     try {
                         jsonObject = jsonArray.getJSONObject(0);
-                        Usuario usuarioActual = new Usuario(jsonObject.optInt("dni"),
+                        usuarioActual = new Usuario(jsonObject.optInt("dni"),
                                 jsonObject.optString("nombre"),
                                 jsonObject.optString("apellido"),
                                 jsonObject.optString("nacimiento"),
                                 jsonObject.optString("correo"),
                                 jsonObject.optString("pass"));
                         usuarioActual.setDato(jsonObject.optString("foto"));
+
+                        switch (jsonObject.optString("estado_membresia_profesor")){
+                            case "DESHABILITADA":
+                                usuarioActual.setMembresia(EstadoMembresia.DESHABILITADA);
+                                break;
+                            case "HABILITADA":
+                                usuarioActual.setMembresia(EstadoMembresia.HABILITADA);
+                                break;
+                            case "EN_ESPERA":
+                                usuarioActual.setMembresia(EstadoMembresia.EN_ESPERA);
+                                break;
+                        }
 
                         //Setea campos
                         edtDni.setText(String.valueOf(usuarioActual.getDni()));
@@ -307,12 +312,18 @@ public class GestionUsuarioActivity extends AppCompatActivity{
                     progressDialog.hide();
 
                     if (response.trim().equalsIgnoreCase("actualiza")){
-                        Toast.makeText(GestionUsuarioActivity.this,"Se ha Actualizado con exito",Toast.LENGTH_SHORT).show();
                         Log.i("RESPUESTA: ",""+response);
 
-                        guardarLoginSharedPreferences(edtCorreo.getText().toString(), edtPass.getText().toString());
+                        usuarioActual.setDni(Integer.parseInt(edtDni.getText().toString()));
+                        usuarioActual.setNombre(edtNombre.getText().toString());
+                        usuarioActual.setApellido(edtApellido.getText().toString());
+                        usuarioActual.setNacimiento(edtNacimiento.getText().toString());
+                        usuarioActual.setCorreo(edtCorreo.getText().toString());
+                        usuarioActual.setPass(edtPass.getText().toString());
+                        usuarioActual.setFotoPerfil(bitmap);
+
+                        guardarLoginSharedPreferences(usuarioActual);
                     }else{
-                        Toast.makeText(GestionUsuarioActivity.this,"No se ha Actualizado ",Toast.LENGTH_SHORT).show();
                         Log.i("RESPUESTA: ",""+response);
                     }
 
@@ -331,6 +342,18 @@ public class GestionUsuarioActivity extends AppCompatActivity{
                 params.put("nacimiento", edtNacimiento.getText().toString());
                 params.put("correo", edtCorreo.getText().toString());
                 params.put("pass", edtPass.getText().toString());
+
+                switch (usuarioActual.getMembresia()){
+                    case EN_ESPERA:
+                        params.put("estado_membresia_profesor", "EN_ESPERA");
+                        break;
+                    case DESHABILITADA:
+                        params.put("estado_membresia_profesor", "DESHABILITADA");
+                        break;
+                    case HABILITADA:
+                        params.put("estado_membresia_profesor", "HABILITADA");
+                        break;
+                }
 
                 String fotoPerfil = convertirImgString(bitmap);
                 params.put("foto", fotoPerfil);
@@ -385,6 +408,18 @@ public class GestionUsuarioActivity extends AppCompatActivity{
                 params.put("nacimiento", edtNacimiento.getText().toString());
                 params.put("correo", edtCorreo.getText().toString());
                 params.put("pass", edtPass.getText().toString());
+
+                switch (usuarioActual.getMembresia()){
+                    case EN_ESPERA:
+                        params.put("estado_membresia_profesor", "EN_ESPERA");
+                        break;
+                    case DESHABILITADA:
+                        params.put("estado_membresia_profesor", "DESHABILITADA");
+                        break;
+                    case HABILITADA:
+                        params.put("estado_membresia_profesor", "HABILITADA");
+                        break;
+                }
 
                 String fotoPerfil = convertirImgString(bitmap);
                 params.put("foto", fotoPerfil);
@@ -653,11 +688,16 @@ public class GestionUsuarioActivity extends AppCompatActivity{
         return  preferences.getString(keyPref, "");
     }
 
-    private void guardarLoginSharedPreferences(String email, String pass) {
+    private void guardarLoginSharedPreferences(Usuario usuario) {
         SharedPreferences sharedPref = getSharedPreferences("login_preferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("email", email);
-        editor.putString("pass", pass);
+        editor.putString("dni", String.valueOf(usuario.getDni()));
+        editor.putString("nombre", usuario.getNombre());
+        editor.putString("apellido", usuario.getApellido());
+        editor.putString("nacimiento", usuario.getNacimiento());
+        editor.putString("correo", usuario.getCorreo());
+        editor.putString("pass", usuario.getPass());
+        editor.putString("membresia", usuario.getMembresia().toString());
 
         editor.apply();
         editor.commit();

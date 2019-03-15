@@ -18,6 +18,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
 import com.eliascapasso.auxilio.Modelo.Usuario;
 import com.eliascapasso.auxilio.R;
 
@@ -136,6 +137,18 @@ public class LoginActivity extends AppCompatActivity{
                         miUsuario.setCorreo(jsonObject.optString("correo"));
                         miUsuario.setPass(jsonObject.optString("pass"));
                         miUsuario.setDato(jsonObject.optString("foto"));
+
+                        switch (jsonObject.optString("estado_membresia_profesor")){
+                            case "DESHABILITADA":
+                                miUsuario.setMembresia(EstadoMembresia.DESHABILITADA);
+                                break;
+                            case "HABILITADA":
+                                miUsuario.setMembresia(EstadoMembresia.HABILITADA);
+                                break;
+                            case "EN_ESPERA":
+                                miUsuario.setMembresia(EstadoMembresia.EN_ESPERA);
+                                break;
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -169,9 +182,9 @@ public class LoginActivity extends AppCompatActivity{
         editor.putString("nombre", usuario.getNombre());
         editor.putString("apellido", usuario.getApellido());
         editor.putString("nacimiento", usuario.getNacimiento());
-        editor.putString("dato", usuario.getDato());
-        editor.putString("email", usuario.getCorreo());
+        editor.putString("correo", usuario.getCorreo());
         editor.putString("pass", usuario.getPass());
+        editor.putString("membresia", usuario.getMembresia().toString());
 
         if(swRecordarInicio.isChecked()){
             editor.putBoolean("recordar", true);

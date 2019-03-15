@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,10 +34,13 @@ import com.eliascapasso.auxilio.Fragmentos.ProfesorListaCursosFragment;
 import com.eliascapasso.auxilio.Fragmentos.SolicitarCredencialFragment;
 import com.eliascapasso.auxilio.Modelo.Usuario;
 import com.eliascapasso.auxilio.R;
+import com.sun.mail.iap.ByteArray;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
@@ -101,7 +107,13 @@ public class MainActivity extends AppCompatActivity {
                                 jsonObject.optString("nacimiento"),
                                 jsonObject.optString("correo"),
                                 jsonObject.optString("pass"));
+
                         usuarioActual.setDato(jsonObject.optString("foto"));
+
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        usuarioActual.getFotoPerfil().compress(Bitmap.CompressFormat.PNG, 100, baos);
+                        byte[] imageBytes = baos.toByteArray();
+                        String encodedImage = android.util.Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
                         switch (jsonObject.optString("estado_membresia_profesor")){
                             case "DESHABILITADA":
