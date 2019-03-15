@@ -8,7 +8,6 @@ public class Curso {
     private int costo;
     private int cupos;
     private Double calificacion;
-    private String duracion;
     private int dni_profesor;
 
     public Curso(String titulo, String fecha, int costo, int cupos, Double calificacion, int dni_profesor) {
@@ -46,14 +45,6 @@ public class Curso {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public String getDuracion() {
-        return duracion;
-    }
-
-    public void setDuracion(String duracion) {
-        this.duracion = duracion;
     }
 
     public String getFecha() {

@@ -68,6 +68,4 @@
         android:textColor="@android:color/background_light"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- TODO: Update blank fragment layout -->
-
 </android.support.constraint.ConstraintLayout>

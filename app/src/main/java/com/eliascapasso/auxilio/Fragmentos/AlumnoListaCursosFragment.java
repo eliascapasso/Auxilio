@@ -198,7 +198,6 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
                             curso.setCosto(jsonObject.optInt("costo"));
                             curso.setCupos(jsonObject.optInt("cupos"));
                             curso.setCalificacion(jsonObject.optDouble("calificacion"));
-                            curso.setDuracion(jsonObject.optString("duracion"));
                             curso.setDni_profesor(jsonObject.optInt("dni_profesor"));
 
                             listaCursos.add(curso);

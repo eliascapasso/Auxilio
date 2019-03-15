@@ -1,7 +1,7 @@
 package com.eliascapasso.auxilio.Fragmentos;
 
-import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,15 +9,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.eliascapasso.auxilio.Actividades.ProfesorGestionCursoActivity;
 import com.eliascapasso.auxilio.Adaptadores.AdaptadorCursos;
 import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
 import com.eliascapasso.auxilio.Modelo.Curso;
@@ -94,7 +95,6 @@ public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment
                             curso.setCosto(jsonObject.optInt("costo"));
                             curso.setCupos(jsonObject.optInt("cupos"));
                             curso.setCalificacion(jsonObject.optDouble("calificacion"));
-                            curso.setDuracion(jsonObject.optString("duracion"));
                             curso.setDni_profesor(jsonObject.optInt("dni_profesor"));
 
                             if(curso.getDni_profesor() == usuarioActual.getDni()){
@@ -170,5 +170,18 @@ public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.action_bar_main, menu);
         super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.agregarCurso){
+            Intent nuevoCurso = new Intent(getContext(), ProfesorGestionCursoActivity.class);
+            nuevoCurso.putExtra("gestion", ProfesorGestionCursoActivity.CREA);
+            startActivity(nuevoCurso);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

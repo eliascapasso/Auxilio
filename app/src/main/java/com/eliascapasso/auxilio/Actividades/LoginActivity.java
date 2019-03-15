@@ -143,7 +143,7 @@ public class LoginActivity extends AppCompatActivity{
                     if(edtEmail.getText().toString().equals(miUsuario.getCorreo()) && edtPass.getText().toString().equals(miUsuario.getPass())){
 
                         //Preferencias compartidas
-                        guardarLoginSharedPreferences(edtEmail.getText().toString(), edtPass.getText().toString());
+                        guardarLoginSharedPreferences(miUsuario);
 
                         Intent main = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(main);
@@ -162,11 +162,16 @@ public class LoginActivity extends AppCompatActivity{
         request.add(jsonObjectRequest);
     }
 
-    private void guardarLoginSharedPreferences(String email, String pass) {
+    private void guardarLoginSharedPreferences(Usuario usuario) {
         SharedPreferences sharedPref = getSharedPreferences("login_preferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("email", email);
-        editor.putString("pass", pass);
+        editor.putString("dni", String.valueOf(usuario.getDni()));
+        editor.putString("nombre", usuario.getNombre());
+        editor.putString("apellido", usuario.getApellido());
+        editor.putString("nacimiento", usuario.getNacimiento());
+        editor.putString("dato", usuario.getDato());
+        editor.putString("email", usuario.getCorreo());
+        editor.putString("pass", usuario.getPass());
 
         if(swRecordarInicio.isChecked()){
             editor.putBoolean("recordar", true);

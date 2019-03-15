@@ -7,10 +7,11 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA"/><!--- para usar la camara desde la App -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/><!--escribir en memoria para guardar las fotos -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/><!--leer las imagenes guardadas en la galeria -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- - para usar la camara desde la App -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- escribir en memoria para guardar las fotos -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <!-- leer las imagenes guardadas en la galeria -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,8 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Actividades.MainActivity"></activity>
-        <activity android:name=".Actividades.GestionUsuarioActivity"></activity>
+        <activity android:name=".Actividades.MainActivity" />
+        <activity android:name=".Actividades.GestionUsuarioActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -35,9 +36,10 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
 
+        <activity android:name=".Actividades.ProfesorGestionCursoActivity"></activity>
     </application>
 
 </manifest>

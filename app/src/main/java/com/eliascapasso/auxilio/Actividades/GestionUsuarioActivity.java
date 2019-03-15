@@ -82,6 +82,8 @@ public class GestionUsuarioActivity extends AppCompatActivity{
 
     final Calendar myCalendar = Calendar.getInstance();
 
+    private Usuario usuarioActual;
+
     //Widgets
     private EditText edtNacimiento;
     private EditText edtDni;
@@ -127,6 +129,7 @@ public class GestionUsuarioActivity extends AppCompatActivity{
 
     private void inicializar() {
         request = Volley.newRequestQueue(this);
+        usuarioActual = new Usuario();
 
         Bundle extras = getIntent().getExtras();
         int esRegistro = extras.getInt("tipo");
@@ -151,6 +154,23 @@ public class GestionUsuarioActivity extends AppCompatActivity{
     }
 
     private void inicializarCampos() {
+        usuarioActual.setDni(Integer.parseInt(obtenerLoginSharedPreferencesString(this, "dni")));
+        usuarioActual.setNombre(obtenerLoginSharedPreferencesString(this, "nombre"));
+        usuarioActual.setApellido(obtenerLoginSharedPreferencesString(this, "apellido"));
+        usuarioActual.setNacimiento(obtenerLoginSharedPreferencesString(this, "nacimiento"));
+        usuarioActual.setCorreo(obtenerLoginSharedPreferencesString(this, "correo"));
+        usuarioActual.setPass(obtenerLoginSharedPreferencesString(this, "pass"));
+        usuarioActual.setDato(obtenerLoginSharedPreferencesString(this, "dato"));
+
+        edtDni.setText(String.valueOf(usuarioActual.getDni()));
+        edtNombre.setText(usuarioActual.getNombre());
+        edtApellido.setText(usuarioActual.getApellido());
+        edtNacimiento.setText(usuarioActual.getNacimiento());
+        edtCorreo.setText(usuarioActual.getCorreo());
+        edtPass.setText(usuarioActual.getPass());
+    }
+
+    private void obtenerUsuario() {
         //Obtiene el usuario de la bd con el correo
         String ip = getString(R.string.ip);
         String url = "http://"+ ip +"/auxilioBD/wsJSONConsultarUsuario.php?correo=" +
@@ -256,15 +276,14 @@ public class GestionUsuarioActivity extends AppCompatActivity{
                         bitmap = BitmapFactory.decodeResource(GestionUsuarioActivity.this.getResources(),
                                 R.drawable.perfil);
                     }
-
-                    //Si se está registrando un nuevo usuario
+                    //si se está actualizando un usuario existente
                     if(flagActualizacion){
                         actualizarUsuario();
                         finish();
                     }
-                    //si se está actualizando un usuario existente
+                    //Si se está registrando un nuevo usuario
                     else {
-                        cargarUsuario();
+                        crearUsuario();
                     }
                 }
                 else{
@@ -322,7 +341,7 @@ public class GestionUsuarioActivity extends AppCompatActivity{
         //VolleySingleton.getIntanciaVolley(GestionUsuarioActivity.this).addToRequestQueue(stringRequest);
     }
 
-    private void cargarUsuario(){
+    private void crearUsuario(){
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Cargando...");
         progressDialog.show();
@@ -415,18 +434,16 @@ public class GestionUsuarioActivity extends AppCompatActivity{
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear,
                                   int dayOfMonth) {
-                // TODO Auto-generated method stub
                 myCalendar.set(Calendar.YEAR, year);
                 myCalendar.set(Calendar.MONTH, monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                actualizarLabel();
+                actualizarCampo();
             }
         };
 
         edtNacimiento.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO Auto-generated method stub
                 new DatePickerDialog(GestionUsuarioActivity.this, date, myCalendar
                         .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
                         myCalendar.get(Calendar.DAY_OF_MONTH)).show();
@@ -498,7 +515,7 @@ public class GestionUsuarioActivity extends AppCompatActivity{
         }
     }
 
-    private void actualizarLabel() {
+    private void actualizarCampo() {
         String myFormat = "MM/dd/yy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("es"));
 
