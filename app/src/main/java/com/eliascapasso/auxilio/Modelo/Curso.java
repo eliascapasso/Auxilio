@@ -24,7 +24,7 @@ public class Curso {
     }
 
     public int getIdCurso() {
-        return idCurso;
+        return this.idCurso;
     }
 
     public void setIdCurso(int idCurso) {

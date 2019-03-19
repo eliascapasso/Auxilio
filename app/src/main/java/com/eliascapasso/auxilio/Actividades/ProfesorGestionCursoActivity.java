@@ -47,6 +47,7 @@ public class ProfesorGestionCursoActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private ArrayList<Curso> listaCursos;
+    private int idCurso;
 
     private EditText edtTitulo;
     private EditText edtDescr;
@@ -98,7 +99,46 @@ public class ProfesorGestionCursoActivity extends AppCompatActivity {
     }
 
     private void actualizarCurso() {
+        progressDialog =new ProgressDialog(this);
+        progressDialog.setMessage("Cargando...");
+        progressDialog.show();
 
+        String ip=getString(R.string.ip);
+
+        String url="http://"+ ip +"/auxilioBD/wsJSONActualizarCurso.php?";
+
+        StringRequest stringRequest =new StringRequest(Request.Method.POST, url,
+                response -> {
+                    progressDialog.hide();
+
+                    if (response.trim().equalsIgnoreCase("actualiza")){
+                        Toast.makeText(ProfesorGestionCursoActivity.this, "Actualización exitosa", Toast.LENGTH_SHORT).show();
+                        Log.i("RESPUESTA: ",""+response);
+                    }else{
+                        Log.i("RESPUESTA: ",""+response);
+                    }
+
+                },
+                error -> {
+                    Toast.makeText(ProfesorGestionCursoActivity.this,"No se ha podido conectar",Toast.LENGTH_SHORT).show();
+                    Log.i("ERROR: ", error.toString());
+                    progressDialog.hide();
+                }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("id_curso", String.valueOf(idCurso));
+                params.put("titulo", edtTitulo.getText().toString());
+                params.put("descripcion", edtDescr.getText().toString());
+                params.put("cupos", edtCupos.getText().toString());
+                params.put("fecha", edtFecha.getText().toString());
+                params.put("costo", edtCosto.getText().toString());
+
+                return params;
+            }
+        };
+        request.add(stringRequest);
+        //VolleySingleton.getIntanciaVolley(GestionUsuarioActivity.this).addToRequestQueue(stringRequest);
     }
 
     private void crearCurso() {
@@ -158,6 +198,7 @@ public class ProfesorGestionCursoActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         int tipoGestion = extras.getInt("gestion");
+        idCurso = extras.getInt("idCurso");
 
         if(tipoGestion == this.CREA){
             flagCrea = true;
@@ -220,18 +261,24 @@ public class ProfesorGestionCursoActivity extends AppCompatActivity {
                             JSONObject jsonObject=null;
                             jsonObject=json.getJSONObject(i);
 
-                            //TODO:Obtener id curso
+                            if(idCurso == jsonObject.optInt("id_curso")){
+                                curso.setIdCurso(jsonObject.optInt("id_curso"));
+                                curso.setTitulo(jsonObject.optString("titulo"));
+                                curso.setDescripcion(jsonObject.optString("descripcion"));
+                                curso.setFecha(jsonObject.optString("fecha"));
+                                curso.setCosto(jsonObject.optInt("costo"));
+                                curso.setCupos(jsonObject.optInt("cupos"));
+                                curso.setCalificacion(jsonObject.optDouble("calificacion"));
+                                curso.setDni_profesor(jsonObject.optInt("dni_profesor"));
 
-                            curso.setIdCurso(jsonObject.optInt("id_curso"));
-                            curso.setTitulo(jsonObject.optString("titulo"));
-                            curso.setDescripcion(jsonObject.optString("descripcion"));
-                            curso.setFecha(jsonObject.optString("fecha"));
-                            curso.setCosto(jsonObject.optInt("costo"));
-                            curso.setCupos(jsonObject.optInt("cupos"));
-                            curso.setCalificacion(jsonObject.optDouble("calificacion"));
-                            curso.setDni_profesor(jsonObject.optInt("dni_profesor"));
+                                edtTitulo.setText(curso.getTitulo());
+                                edtDescr.setText(curso.getDescripcion());
+                                edtFecha.setText(curso.getFecha());
+                                edtCosto.setText(String.valueOf(curso.getCosto()));
+                                edtCupos.setText(String.valueOf(curso.getCupos()));
 
-                            listaCursos.add(curso);
+                                i = json.length();
+                            }
                         }
 
                     } catch (JSONException e) {

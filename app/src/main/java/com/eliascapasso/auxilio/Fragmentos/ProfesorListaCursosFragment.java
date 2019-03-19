@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.android.volley.Request;
@@ -67,7 +68,23 @@ public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment
 
         inicializarAtributos();
 
+        eligeCurso(view);
+
         return view;
+    }
+
+    private void eligeCurso(View v){
+        final Intent gestionCursos = new Intent(v.getContext(), ProfesorGestionCursoActivity.class);
+
+        lvCursos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int idCurso = listaCursos.get(position).getIdCurso();
+                gestionCursos.putExtra("idCurso", idCurso);
+                gestionCursos.putExtra("gestion", ProfesorGestionCursoActivity.EDITA);
+                startActivity(gestionCursos);
+            }
+        });
     }
 
     private void obtenerCursos() {
@@ -89,6 +106,7 @@ public class ProfesorListaCursosFragment extends android.support.v4.app.Fragment
                             JSONObject jsonObject=null;
                             jsonObject=json.getJSONObject(i);
 
+                            curso.setIdCurso(jsonObject.optInt("id_curso"));
                             curso.setTitulo(jsonObject.optString("titulo"));
                             curso.setDescripcion(jsonObject.optString("descripcion"));
                             curso.setFecha(jsonObject.optString("fecha"));

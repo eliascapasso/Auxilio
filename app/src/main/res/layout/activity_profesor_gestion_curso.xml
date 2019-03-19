@@ -31,13 +31,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <TextView
+                android:id="@+id/txtTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Titulo"
+                android:textColor="#9b9a9a" />
+
             <EditText
                 android:id="@+id/edtTituloCurso"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
                 android:background="@android:color/background_light"
                 android:ems="10"
                 android:hint="Titulo"
@@ -47,13 +53,19 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView3"
                 tools:ignore="MissingConstraints" />
 
+            <TextView
+                android:id="@+id/txtDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Descripción"
+                android:textColor="#9b9a9a" />
+
             <EditText
                 android:id="@+id/edtDescrCurso"
                 android:layout_width="match_parent"
                 android:layout_height="189dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="28dp"
                 android:background="@android:color/background_light"
                 android:ems="10"
                 android:hint="Descripción"
@@ -64,13 +76,19 @@
                 app:layout_constraintTop_toBottomOf="@+id/edtEmail"
                 tools:ignore="MissingConstraints" />
 
+            <TextView
+                android:id="@+id/txtCupos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cupos"
+                android:textColor="#9b9a9a" />
+
             <EditText
                 android:id="@+id/edtCuposCurso"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="28dp"
                 android:background="@android:color/background_light"
                 android:ems="10"
                 android:hint="Cupos"
@@ -80,6 +98,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/editText9"
                 tools:ignore="MissingConstraints" />
+
+            <TextView
+                android:id="@+id/txtFecha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha"
+                android:textColor="#9b9a9a" />
 
             <com.shagi.materialdatepicker.date.AccessibleDateAnimator
                 android:id="@+id/dpkNacimiento"
@@ -93,7 +118,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="28dp"
                     android:background="@android:color/background_light"
                     android:ems="10"
                     android:hint="Fecha"
@@ -105,13 +129,19 @@
                     tools:ignore="MissingConstraints" />
             </com.shagi.materialdatepicker.date.AccessibleDateAnimator>
 
+            <TextView
+                android:id="@+id/txtCosto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Costo (Bs)"
+                android:textColor="#9b9a9a" />
+
             <EditText
                 android:id="@+id/edtCostoCurso"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="28dp"
                 android:background="@android:color/background_light"
                 android:ems="10"
                 android:hint="Costo"
