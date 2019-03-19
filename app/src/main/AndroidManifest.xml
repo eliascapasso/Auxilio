@@ -39,7 +39,9 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity android:name=".Actividades.ProfesorGestionCursoActivity"></activity>
+        <activity android:name=".Actividades.ProfesorGestionCursoActivity" />
+        <activity android:name=".Actividades.AlumnoSolicitaCursoActivity" />
+        <activity android:name=".Actividades.AlumnoCursoActivity"></activity>
     </application>
 
 </manifest>

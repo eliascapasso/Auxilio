@@ -2,12 +2,14 @@ package com.eliascapasso.auxilio.Fragmentos;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -17,7 +19,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.eliascapasso.auxilio.Actividades.LoginActivity;
+import com.eliascapasso.auxilio.Actividades.AlumnoCursoActivity;
+import com.eliascapasso.auxilio.Actividades.AlumnoSolicitaCursoActivity;
 import com.eliascapasso.auxilio.Adaptadores.AdaptadorCursos;
 import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
 import com.eliascapasso.auxilio.Modelo.AlumnoCurso;
@@ -36,7 +39,9 @@ import static android.content.Context.MODE_PRIVATE;
 public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
     private static String PREFS_KEY = "login_preferences";
 
-    private ArrayList<Curso> listaCursos;
+    private ArrayList<Curso> listaTodosCursos;
+    private ArrayList<Curso> listaDemasCursos;
+    private ArrayList<Curso> listaCursosFiltrados;
     private ArrayList<AlumnoCurso> listaAlumnosCursos;
     private ListView lvCursos;
     private ToggleButton tgBtnFiltroCursos;
@@ -65,14 +70,36 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
 
         filtroCursos();
 
+        eligeCurso(view);
+
         return view;
     }
 
     private void inicializarAtributos(View v){
-        listaCursos = new ArrayList<Curso>();
+        listaTodosCursos = new ArrayList<Curso>();
         listaAlumnosCursos = new ArrayList<AlumnoCurso>();
 
         obtenerUsuario();
+    }
+
+    private void eligeCurso(View v){
+        lvCursos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int idCurso = listaTodosCursos.get(position).getIdCurso();
+
+                if(tgBtnFiltroCursos.isChecked()){
+                    final Intent curso = new Intent(v.getContext(), AlumnoCursoActivity.class);
+                    curso.putExtra("idCurso", idCurso);
+                    startActivity(curso);
+                }
+                else{
+                    final Intent curso = new Intent(v.getContext(), AlumnoSolicitaCursoActivity.class);
+                    curso.putExtra("idCurso", idCurso);
+                    startActivity(curso);
+                }
+            }
+        });
     }
 
     private void obtenerUsuario() {
@@ -200,10 +227,13 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
                             curso.setCalificacion(jsonObject.optDouble("calificacion"));
                             curso.setDni_profesor(jsonObject.optInt("dni_profesor"));
 
-                            listaCursos.add(curso);
+                            listaTodosCursos.add(curso);
                         }
                         progressDialog.hide();
-                        lvCursos.setAdapter(new AdaptadorCursos(getView().getContext(), listaCursos));
+
+                        inicializarListasCursos();
+
+                        lvCursos.setAdapter(new AdaptadorCursos(getView().getContext(), listaDemasCursos));
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -225,31 +255,41 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
                 if(listaAlumnosCursos.size() != 0){
                     if(isChecked)
                     {
-                        ArrayList<Integer> idCursos = new ArrayList<Integer>();
-                        ArrayList<Curso> cursosFiltrados = new ArrayList<Curso>();
-                        for(AlumnoCurso ac: listaAlumnosCursos){
-                            if(usuarioActual.getDni() == ac.getDni_alumno()){
-                                idCursos.add(ac.getId_curso());
-                            }
-                        }
-
-                        for (Curso c: listaCursos){
-                            for(Integer idC: idCursos){
-                                if(idC.equals(c.getIdCurso())){
-                                    cursosFiltrados.add(c);
-                                }
-                            }
-                        }
-
-                        lvCursos.setAdapter(new AdaptadorCursos(getView().getContext(), cursosFiltrados));
+                        lvCursos.setAdapter(new AdaptadorCursos(getView().getContext(), listaCursosFiltrados));
                     }
                     else
                     {
-                        lvCursos.setAdapter(new AdaptadorCursos(getView().getContext(), listaCursos));
+                        lvCursos.setAdapter(new AdaptadorCursos(getView().getContext(), listaDemasCursos));
                     }
                 }
             }
         });
+    }
+
+    private void inicializarListasCursos(){
+        listaCursosFiltrados = new ArrayList<Curso>();
+        listaDemasCursos = new ArrayList<Curso>();
+        ArrayList<Integer> idCursos = new ArrayList<Integer>();
+
+        for(AlumnoCurso ac: listaAlumnosCursos){
+            if(usuarioActual.getDni() == ac.getDni_alumno()){
+                idCursos.add(ac.getId_curso());
+            }
+        }
+
+        for (Curso c: listaTodosCursos){
+            for(Integer idC: idCursos){
+                if(idC.equals(c.getIdCurso())){
+                    listaCursosFiltrados.add(c);
+                }
+            }
+        }
+
+        for(Curso c: listaTodosCursos){
+            if(!listaCursosFiltrados.contains(c)){
+                listaDemasCursos.add(c);
+            }
+        }
     }
 
     public static String obtenerLoginSharedPreferencesString(Context context, String keyPref) {
