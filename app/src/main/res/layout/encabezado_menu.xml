@@ -11,12 +11,10 @@
         android:scaleType="centerCrop" />
 
     <TextView
-        android:id="@+id/txtNombreApellidoUsuario"
+        android:id="@+id/txtNombreApellidoToolbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
         android:text="NOMBRE Y APELLIDO"
         android:textAppearance="@style/TextAppearance.AppCompat.Large.Inverse"
         android:textColor="#000000"

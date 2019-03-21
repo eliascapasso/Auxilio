@@ -21,6 +21,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navView;
     private TabLayout tabLayout;
     private ActionBarDrawerToggle mToggle;
+    private ImageView iwFotoPerfil;
+    private TextView txtNombreApellido;
 
     private static final int INTERVALO = 2000; //2 segundos para salir
     private long tiempoPrimerClick;
@@ -73,10 +77,14 @@ public class MainActivity extends AppCompatActivity {
         mToggle.syncState();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        iwFotoPerfil = (ImageView) findViewById(R.id.fotoPerfilToolbar);
+        txtNombreApellido = (TextView) findViewById(R.id.txtNombreApellidoToolbar);
+
         request = Volley.newRequestQueue(this);
 
         obtenerUsuario();
 
+        //Toolbar
         setupNavigationDrawerContent(navView);
 
         setFragment(1);

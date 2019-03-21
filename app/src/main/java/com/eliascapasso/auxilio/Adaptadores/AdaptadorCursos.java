@@ -34,7 +34,7 @@ public class AdaptadorCursos extends BaseAdapter {
             //Instanciamos los recursos
             cursoHolder.tvTituloCurso = (TextView) view.findViewById(R.id.tvTituloCurso);
             cursoHolder.tvCostoCurso = (TextView) view.findViewById(R.id.tvCostoCurso);
-            cursoHolder.rtgCalificacion = (RatingBar) view.findViewById(R.id.rtgCalificacion);
+            cursoHolder.rtgCalificacion = (RatingBar) view.findViewById(R.id.rtgCalificacionCurso);
             //asignamos el viewHolder a la vista
             view.setTag(cursoHolder);
             //Al cambiar el codigo, debemos llamar nosotros al metodo createViews() de la vista

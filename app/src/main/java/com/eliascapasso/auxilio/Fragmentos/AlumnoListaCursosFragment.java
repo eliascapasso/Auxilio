@@ -46,10 +46,10 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
     private ListView lvCursos;
     private ToggleButton tgBtnFiltroCursos;
 
-    ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
 
-    RequestQueue request;
-    JsonObjectRequest jsonObjectRequest;
+    private RequestQueue request;
+    private JsonObjectRequest jsonObjectRequest;
     private Usuario usuarioActual;
 
     public AlumnoListaCursosFragment() {
@@ -86,7 +86,13 @@ public class AlumnoListaCursosFragment extends android.support.v4.app.Fragment {
         lvCursos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int idCurso = listaTodosCursos.get(position).getIdCurso();
+                int idCurso;
+                if(tgBtnFiltroCursos.isChecked()){
+                    idCurso = listaCursosFiltrados.get(position).getIdCurso();
+                }
+                else{
+                    idCurso = listaDemasCursos.get(position).getIdCurso();
+                }
 
                 if(tgBtnFiltroCursos.isChecked()){
                     final Intent curso = new Intent(v.getContext(), AlumnoCursoActivity.class);

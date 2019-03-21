@@ -48,17 +48,17 @@
         app:layout_constraintVertical_bias="0.39" />
 
     <RatingBar
-        android:id="@+id/rtgCalificacion"
+        android:id="@+id/rtgCalificacionCurso"
         android:layout_width="240dp"
         android:layout_height="44dp"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
+        android:progressBackgroundTint="#919191"
+        android:progressTint="#ffdd00"
         android:scaleX="0.5"
         android:scaleY="0.5"
-        android:transformPivotX="0dp"
-        android:progressTint= "#ffdd00"
-        android:progressBackgroundTint="#000000"
         android:secondaryProgressTint="#000000"
+        android:transformPivotX="0dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline8"
         app:layout_constraintStart_toStartOf="parent" />
 </android.support.constraint.ConstraintLayout>
