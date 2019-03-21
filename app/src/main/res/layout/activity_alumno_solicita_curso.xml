@@ -9,7 +9,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="64dp"
+        tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp">
 
         <LinearLayout
@@ -73,19 +73,41 @@
                     tools:layout_editor_absoluteY="115dp" />
             </LinearLayout>
 
-            <RatingBar
-                android:id="@+id/rtgCalificacionProfesor"
-                android:layout_width="wrap_content"
-                android:layout_height="42dp"
-                android:numStars="5"
-                android:progressBackgroundTint="#919191"
-                android:progressTint="#ffdd00"
-                android:scaleX="0.5"
-                android:scaleY="0.5"
-                android:secondaryProgressTint="#000000"
-                tools:ignore="MissingConstraints"
-                tools:layout_editor_absoluteX="16dp"
-                tools:layout_editor_absoluteY="128dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <RatingBar
+                    android:id="@+id/rtgCalificacionProfesor"
+                    android:layout_width="253dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:numStars="5"
+                    android:progressBackgroundTint="#919191"
+                    android:progressTint="#ffdd00"
+                    android:scaleX="0.8"
+                    android:scaleY="0.5"
+                    tools:ignore="MissingConstraints"
+                    tools:layout_editor_absoluteX="16dp"
+                    tools:layout_editor_absoluteY="128dp" />
+
+                <TextView
+                    android:id="@+id/txtCalificacionProfesor"
+                    android:layout_width="61dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="0.0"
+                    android:textAlignment="textStart"
+                    android:textColor="@android:color/black"
+                    android:textSize="26sp" />
+
+                <Space
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/textView16"
@@ -160,17 +182,33 @@
                 tools:layout_editor_absoluteX="8dp"
                 tools:layout_editor_absoluteY="388dp" />
 
-            <RatingBar
-                android:id="@+id/ratingCurso"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:numStars="5"
-                android:progressBackgroundTint="#919191"
-                android:progressTint="#ffdd00"
-                android:secondaryProgressTint="#000000"
-                tools:ignore="MissingConstraints"
-                tools:layout_editor_absoluteX="8dp"
-                tools:layout_editor_absoluteY="415dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <RatingBar
+                    android:id="@+id/ratingCurso"
+                    android:layout_width="139dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:numStars="5"
+                    android:progressBackgroundTint="#919191"
+                    android:progressTint="#ffdd00"
+                    tools:ignore="MissingConstraints"
+                    tools:layout_editor_absoluteX="8dp"
+                    tools:layout_editor_absoluteY="415dp" />
+
+                <TextView
+                    android:id="@+id/txtCalificacionCurso"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="0.0"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="30sp" />
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btnSolicitarCurso"
@@ -184,10 +222,5 @@
 
         </LinearLayout>
     </ScrollView>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"></LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

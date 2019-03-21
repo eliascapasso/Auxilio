@@ -45,7 +45,7 @@ import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class SolicitarCredencialFragment extends android.support.v4.app.Fragment{
+public class ProfesorSolicitarCredencialFragment extends android.support.v4.app.Fragment{
 
     final Calendar myCalendar = Calendar.getInstance();
 
@@ -62,7 +62,7 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
     private RequestQueue request;
     private JsonObjectRequest jsonObjectRequest;
 
-    public SolicitarCredencialFragment() {
+    public ProfesorSolicitarCredencialFragment() {
 
     }
 
@@ -141,8 +141,8 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             //Envia un correo al administrador
-                            new MailJob("capassoelias@gmail.com", "39033653").execute(
-                                    new MailJob.Mail("capassoelias@gmail.com",
+                            new MailJob("auxilio.bv@gmail.com", "auxilio123").execute(
+                                    new MailJob.Mail("auxilio.bv@gmail.com",
                                                     "elias_capasso@live.com",
                                                     "Solicitud de credencial",
                                                     "Datos del solicitante:\n"+
@@ -156,8 +156,8 @@ public class SolicitarCredencialFragment extends android.support.v4.app.Fragment
                             );
 
                             //Envia un correo al usuario
-                            new MailJob("capassoelias@gmail.com", "39033653").execute(
-                                    new MailJob.Mail("capassoelias@gmail.com",
+                            new MailJob("auxilio.bv@gmail.com", "auxilio123").execute(
+                                    new MailJob.Mail("auxilio.bv@gmail.com",
                                                     usuarioActual.getCorreo(),
                                                     "Solicitud de credencial",
                                                     "Hemos recibido con éxito su petición para adquirir una credencial para dar cursos en nuestro portal.\n"+

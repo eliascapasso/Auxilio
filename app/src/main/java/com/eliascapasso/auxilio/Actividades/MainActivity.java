@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
@@ -19,7 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,10 +31,9 @@ import com.eliascapasso.auxilio.Enumerados.EstadoMembresia;
 import com.eliascapasso.auxilio.Fragmentos.AlumnoListaCursosFragment;
 import com.eliascapasso.auxilio.Fragmentos.ProfesorIngresarCodigoFragment;
 import com.eliascapasso.auxilio.Fragmentos.ProfesorListaCursosFragment;
-import com.eliascapasso.auxilio.Fragmentos.SolicitarCredencialFragment;
+import com.eliascapasso.auxilio.Fragmentos.ProfesorSolicitarCredencialFragment;
 import com.eliascapasso.auxilio.Modelo.Usuario;
 import com.eliascapasso.auxilio.R;
-import com.sun.mail.iap.ByteArray;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -200,8 +197,8 @@ public class MainActivity extends AppCompatActivity {
                 if(usuarioActual.getMembresia().equals(EstadoMembresia.DESHABILITADA)){
                     fragmentManager = getSupportFragmentManager();
                     fragmentTransaction = fragmentManager.beginTransaction();
-                    SolicitarCredencialFragment solicitarCredencialFragment = new SolicitarCredencialFragment();
-                    fragmentTransaction.replace(R.id.contenido, solicitarCredencialFragment);
+                    ProfesorSolicitarCredencialFragment profesorSolicitarCredencialFragment = new ProfesorSolicitarCredencialFragment();
+                    fragmentTransaction.replace(R.id.contenido, profesorSolicitarCredencialFragment);
                     //fragmentTransaction.addToBackStack("frag3");
                     fragmentTransaction.commit();
                 }

@@ -28,10 +28,12 @@ public class AlumnoSolicitaCursoActivity extends AppCompatActivity {
     private TextView txtCuposCurso;
     private TextView txtNombreProfesor;
     private RatingBar rbCalificacionProfesor;
+    private TextView txtCalificacionProfesor;
     private TextView txtDescrCurso;
     private TextView txtFechaCurso;
     private TextView txtCostoCurso;
     private RatingBar rbCalificacionCurso;
+    private TextView txtCalificacionCurso;
 
     RequestQueue request;
     JsonObjectRequest jsonObjectRequest;
@@ -47,14 +49,42 @@ public class AlumnoSolicitaCursoActivity extends AppCompatActivity {
         txtCuposCurso = (TextView) findViewById(R.id.txtCuposCurso);
         txtNombreProfesor = (TextView) findViewById(R.id.txtNombreProfesor);
         rbCalificacionProfesor = (RatingBar) findViewById(R.id.rtgCalificacionProfesor);
+        txtCalificacionProfesor = (TextView) findViewById(R.id.txtCalificacionProfesor);
         txtDescrCurso = (TextView) findViewById(R.id.txtDescrCurso);
         txtFechaCurso = (TextView) findViewById(R.id.txtFechaCurso);
         txtCostoCurso = (TextView) findViewById(R.id.txtCostoCurso);
         rbCalificacionCurso = (RatingBar) findViewById(R.id.rtgCalificacionCurso);
+        txtCalificacionCurso = (TextView) findViewById(R.id.txtCalificacionCurso);
 
         request = Volley.newRequestQueue(this);
 
         inicializar();
+
+        ratingBar();
+    }
+
+    private void ratingBar() {
+        if(rbCalificacionProfesor != null){
+            rbCalificacionProfesor.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+
+                // Called when the user swipes the RatingBar
+                @Override
+                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                    txtCalificacionProfesor.setText(String.valueOf(rating));
+                }
+            });
+        }
+
+        if(rbCalificacionCurso != null){
+            rbCalificacionCurso.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+
+                // Called when the user swipes the RatingBar
+                @Override
+                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                    txtCalificacionCurso.setText(String.valueOf(rating));
+                }
+            });
+        }
     }
 
     private void inicializar() {
